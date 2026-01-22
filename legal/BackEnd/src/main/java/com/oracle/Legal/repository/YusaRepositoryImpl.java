@@ -2,24 +2,23 @@ package com.oracle.Legal.repository;
 
 import org.springframework.stereotype.Repository;
 
-import com.oracle.Legal.domain.Account;
+import com.oracle.Legal.domain.Yusa;
 
 import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
-public class AccountRepositoryImpl implements AccountRepository {
+public class YusaRepositoryImpl implements YusaRepository {
 
 	private final EntityManager em;
-
+	
 	@Override
-	public void save(Account account) {
+	public Yusa yusaSave(Yusa yusa) {
 		
-		em.persist(account);
+	em.persist(yusa);
+	
+	return yusa;
 	}
 	
-	
-
 }

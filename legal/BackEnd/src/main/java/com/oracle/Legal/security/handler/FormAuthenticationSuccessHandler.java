@@ -26,7 +26,7 @@ public class FormAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
 			                            Authentication authentication)
 			throws IOException, ServletException {
 		 // setDefaultTargetUrl("/"); // 인증 성공 후 기본적으로 이동할 URL 설정 (예: 홈 페이지)
-		 setDefaultTargetUrl("/main");
+		 setDefaultTargetUrl("/");
 		// 인증 성공 후 사용자가 요청한 URL로 리다이렉트
 		var savedRequest = requestCache.getRequest(request, response);
 		if (savedRequest != null) {

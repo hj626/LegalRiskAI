@@ -39,17 +39,17 @@ public class LoginController {
 	        return "login/loginPage";
 	}
 	
-	/*
-	 * //로그아웃
-	 * 
-	 * @GetMapping(value = "/logout") public String logout(HttpServletRequest
-	 * request, HttpServletResponse response) { Authentication authentication =
-	 * SecurityContextHolder.getContextHolderStrategy() .getContext()
-	 * .getAuthentication(); if (authentication != null) { new
-	 * SecurityContextLogoutHandler().logout(request, response, authentication); }
-	 * 
-	 * return "redirect:/login"; }
-	 */
+	
+	  //로그아웃
+	  
+	  @GetMapping(value = "/logout") public String logout(HttpServletRequest
+	  request, HttpServletResponse response) { Authentication authentication =
+	  SecurityContextHolder.getContextHolderStrategy() .getContext()
+	  .getAuthentication(); if (authentication != null) { new
+	  SecurityContextLogoutHandler().logout(request, response, authentication); }
+	  
+	  return "redirect:/login"; }
+	 
     //로그인 정보가 틀렸을 경우
     @GetMapping(value="/denied")
     public String accessDenied(@RequestParam(value = "exception", required = false) String exception, 

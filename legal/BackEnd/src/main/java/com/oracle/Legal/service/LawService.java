@@ -1,9 +1,23 @@
 package com.oracle.Legal.service;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.oracle.Legal.dto.LawDto;
+import com.oracle.Legal.domain.Law;
+import com.oracle.Legal.repository.LawRepository;
 
-public interface LawService {
+import lombok.RequiredArgsConstructor;
 
-	int lawSave(LawDto lawDto);
+@Service
+@RequiredArgsConstructor
+public class LawService {
 
+    private final LawRepository lawRepository;
+
+    @Transactional
+    public int save(String lawInput, int clientCode) {
+        Law law = new Law();
+        law.setClient_code(clientCode);
+        law.setLaw_input(lawInput);
+        return lawRepository.lawSave(law).getLaw_code();
+    }
 }

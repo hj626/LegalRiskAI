@@ -1,12 +1,12 @@
-package com.oracle.Legal.controller;
-
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-@Controller
-public class ReactController {
-	  @RequestMapping({"/law","/boonjang","/jogi","/yusa"})
-	  public String IndexForwarding() {
-	    return "forward:/index.html";
-	  }
-}	
+	package com.oracle.Legal.controller;
+	
+	import org.springframework.stereotype.Controller;
+	import org.springframework.web.bind.annotation.RequestMapping;
+	
+	@Controller
+	public class ReactController {
+		@RequestMapping({"/law","/boonjang","/jogi","/yusa"})
+		public String IndexForwarding() {
+		return "forward:/index.html";
+		  }
+	}	

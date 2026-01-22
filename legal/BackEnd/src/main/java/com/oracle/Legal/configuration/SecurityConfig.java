@@ -43,7 +43,7 @@ public class SecurityConfig {
                     .requestMatchers( "/css/**", "/images/**", "/js/**", "/favicon.*", "/*/icon-*"
                     	         	, "/WEB-INF/views/**").permitAll()
             //login
-                    .requestMatchers("/", "/login", "/error**", "/assets/**", "/test/**").permitAll()
+                    .requestMatchers("/", "/login", "/error**", "/assets/**").permitAll()
                     .requestMatchers("/client/**").permitAll()
                     
                     //법적위험

@@ -5,10 +5,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.oracle.Legal.dto.ClientDto;
 import com.oracle.Legal.service.ClientService;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -39,6 +41,21 @@ public class ClientController {
     return "redirect:/login";          
 	}
 	
+	
+	/*
+	 * @GetMapping("/session-check")
+	 * 
+	 * @ResponseBody public String sessionCheck(HttpSession session) {
+	 * 
+	 * Object clientCode = session.getAttribute("client_code");
+	 * 
+	 * System.out.println("==== SESSION CHECK ====");
+	 * System.out.println("session id = " + session.getId());
+	 * System.out.println("client_code = " + clientCode);
+	 * System.out.println("======================");
+	 * 
+	 * return "client_code = " + clientCode; }
+	 */
 	
 	
 }

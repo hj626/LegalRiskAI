@@ -2,9 +2,9 @@ import { Routes, Route } from "react-router-dom";
 import Yusa from "./pages/yusa.jsx";
 import Law from "./pages/law.jsx";
 import Jogi from "./pages/jogi.jsx";
+import Header from "./component/Header.jsx";
+import Footer from "./component/Footer.jsx";
 import Boonjang from "./pages/boonjang.jsx";
-import Header from "../component/header.jsx";
-import Footer from "../component/footer.jsx";
 
 export default function App() {
   return (

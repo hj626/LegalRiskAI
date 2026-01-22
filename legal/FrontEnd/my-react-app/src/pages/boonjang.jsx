@@ -154,7 +154,7 @@ export default function Boonjang() {
                 {/* 관련 법령 */}
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                    📚 관련 법령
+                    📚 관련 법령_
                   </h4>
                   <ul className="space-y-2">
                     {dummyResult.relatedLaws.map((law, index) => (

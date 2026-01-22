@@ -16,10 +16,10 @@
     </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
-    <%@ include file="../header.jsp" %>
+    
 
     <div class="d-flex flex-grow-1">
-        <%@ include file="../sidebar.jsp" %>
+    
 
         <!-- 본문 + 푸터 같은 컬럼 -->
         <div class="d-flex flex-column flex-grow-1">
@@ -64,7 +64,6 @@
                 </div><!-- form-container -->
             </main>
 
-            <%@ include file="../footer.jsp" %>
         </div>
     </div>
 

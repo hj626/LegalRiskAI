@@ -3,7 +3,9 @@ import { useState } from "react";
 
 export default function Jogi() {
   const [jogiInput, setJogiInput] = useState("");
+  const [jogiOutput, setJogiOutput] = useState("");
   const [jogiWinrate, setJogiWinrate] = useState(""); 
+  const [jogiMark, setJogiMark] = useState(0);
   const [msg, setMsg] = useState("");
 
   const saveJogi = async () => {
@@ -23,6 +25,8 @@ export default function Jogi() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           jogi_input: jogiInput,
+          jogi_output: jogiOutput,
+          jogi_mark: jogiMark,
           jogi_winrate: Number(jogiWinrate), 
         }),
       });
@@ -51,6 +55,14 @@ export default function Jogi() {
         style={{ width: "100%", padding: 12 }}
       />
 
+        <textarea
+        value={jogiOutput}
+        onChange={(e) => setJogiOutput(e.target.value)}
+        rows={8}
+        placeholder="사건 내용을 입력하세요..."
+        style={{ width: "100%", padding: 12 }}
+      />
+
       {/* 승소 확률 */}
       <input
         type="number"
@@ -61,6 +73,15 @@ export default function Jogi() {
         max="100"
         style={{ width: "100%", padding: 12, marginTop: 12 }}
       />
+
+      <label style={{ display: "block", marginTop: 8 }}>
+        <input
+          type="checkbox"
+          checked={jogiMark === 1}
+          onChange={(e) => setJogiMark(e.target.checked ? 1 : 0)}
+        />
+        즐겨찾기
+      </label>
 
       <div style={{ marginTop: 12 }}>
         <button onClick={saveJogi}>저장</button>

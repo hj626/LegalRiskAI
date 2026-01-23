@@ -31,6 +31,6 @@ public class YusaRestController {
         }
 
         int clientCode = principal.getClient_code();
-        return yusaService.save(req.getYusa_input(), clientCode, req.getYusa_mark());
+        return yusaService.save(req.getYusa_input(), clientCode, req.getYusa_output(), req.getYusa_mark());
     }
 }

@@ -17,10 +17,11 @@ public class YusaService {
     private final YusaRepository yusaRepository;
 
     @Transactional
-    public int save(String yusaInput, int clientCode, int yusaMark) {
+    public int save(String yusaInput, int clientCode, String yusaOutput, int yusaMark) {
         Yusa yusa = new Yusa();
         yusa.setClient_code(clientCode);
         yusa.setYusa_input(yusaInput);
+        yusa.setYusa_output(yusaOutput);
         yusa.setYusa_mark(yusaMark);
         return yusaRepository.yusaSave(yusa).getYusa_code();
     }

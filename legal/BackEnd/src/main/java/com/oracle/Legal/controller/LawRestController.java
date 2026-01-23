@@ -29,6 +29,6 @@ public class LawRestController {
         }
 
         int clientCode = principal.getClient_code();
-        return lawService.save(req.getLaw_input(), clientCode);
+        return lawService.save(req.getLaw_input(), clientCode, req.getLaw_output(), req.getLaw_mark());
     }
 }

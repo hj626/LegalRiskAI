@@ -3,6 +3,8 @@ import { useState } from "react";
 
 export default function Law() {
   const [lawInput, setLawInput] = useState("");
+  const [lawOutput, setLawOutput] = useState("");
+  const [lawMark, setLawMark] = useState(0);
   const [msg, setMsg] = useState("");
 
   const saveLaw = async () => {
@@ -15,7 +17,7 @@ export default function Law() {
       const res = await fetch("/api/law/save", {   
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ law_input: lawInput }),
+        body: JSON.stringify({ law_input: lawInput, law_output: lawOutput, law_mark: lawMark }),
       });
 
       if (!res.ok) {
@@ -46,6 +48,23 @@ export default function Law() {
         placeholder="사건 내용을 입력하세요..."
         style={{ width: "100%", padding: 12 }}
       />
+
+            <textarea
+        value={lawOutput}
+        onChange={(e) => setLawOutput(e.target.value)}
+        rows={8}
+        placeholder="사건 내용을 입력하세요..."
+        style={{ width: "100%", padding: 12 }}
+      />
+
+      <label style={{ display: "block", marginTop: 8 }}>
+        <input
+          type="checkbox"
+          checked={lawMark === 1}
+          onChange={(e) => setLawMark(e.target.checked ? 1 : 0)}
+        />
+        즐겨찾기
+      </label>
 
       <div style={{ marginTop: 12 }}>
         <button onClick={saveLaw}>저장</button>

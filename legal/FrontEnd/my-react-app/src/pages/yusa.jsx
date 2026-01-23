@@ -3,6 +3,7 @@ import { useState } from "react";
 
 export default function Yusa() {
   const [yusaInput, setYusaInput] = useState("");
+  const [yusaOutput, setYusaOutput] = useState("");
   const [yusaMark, setYusaMark] = useState(0);
   const [msg, setMsg] = useState("");
 
@@ -18,6 +19,7 @@ export default function Yusa() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           yusa_input: yusaInput,
+          yusa_output: yusaOutput,
           yusa_mark: yusaMark,
         }),
       });
@@ -40,6 +42,13 @@ export default function Yusa() {
       <textarea
         value={yusaInput}
         onChange={(e) => setYusaInput(e.target.value)}
+        rows={8}
+        placeholder="사건 내용을 입력하세요..."
+        style={{ width: "100%", padding: 12 }}
+      />
+                  <textarea
+        value={yusaOutput}
+        onChange={(e) => setYusaOutput(e.target.value)}
         rows={8}
         placeholder="사건 내용을 입력하세요..."
         style={{ width: "100%", padding: 12 }}

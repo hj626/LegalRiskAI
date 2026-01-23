@@ -29,6 +29,6 @@ public class JogiController {
         }
 
         int clientCode = principal.getClient_code();
-        return jogiService.save(req.getJogi_input(), clientCode, req.getJogi_winrate());
+        return jogiService.save(req.getJogi_input(), clientCode, req.getJogi_output(), req.getJogi_winrate(), req.getJogi_mark());
     }
 }

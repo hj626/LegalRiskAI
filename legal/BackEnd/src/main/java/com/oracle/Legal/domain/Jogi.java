@@ -40,6 +40,7 @@ public class Jogi {
 	@CreatedDate
 	private LocalDateTime jogi_date;
 	private int jogi_winrate;
+	private int jogi_mark;
 	
 	public void changeJogi_code(int jogi_code) {
 		this.jogi_code = jogi_code;
@@ -58,5 +59,8 @@ public class Jogi {
 	}
 	public void changejogi_winrate(int jogi_winrate) {
 		this.jogi_winrate = jogi_winrate;
+	}
+	public void changejogi_mark(int jogi_mark) {
+		this.jogi_mark = jogi_mark;
 	}
 }

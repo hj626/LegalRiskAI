@@ -67,7 +67,7 @@ public class Yusa {
         this.yusa_date = yusa_date;
     }
 
-    public void changeYusa_bookmark(int yusa_mark) {
+    public void changeYusa_mark(int yusa_mark) {
         this.yusa_mark = yusa_mark;
     }
 }

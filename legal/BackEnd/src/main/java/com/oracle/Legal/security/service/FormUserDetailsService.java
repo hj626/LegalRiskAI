@@ -17,40 +17,54 @@ import com.oracle.Legal.security.user.repository.UserRepository;
 import com.oracle.Legal.domain.Account;
 import com.oracle.Legal.dto.AccountContext;
 import com.oracle.Legal.dto.AccountDto;
+import com.oracle.Legal.dto.ClientDto;
+import com.oracle.Legal.repository.ClientRepository;
 
 import lombok.RequiredArgsConstructor;
 
-@Service("userDetailService") // 이름은 상관없지만 타입 주입이면 그대로 OK
+@Service("userDetailService") 
 @RequiredArgsConstructor
 public class FormUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
-    private final ModelMapper modelMapper = new ModelMapper(); // (선호) Bean 주입으로 바꿔도 됩니다.
+    private final ModelMapper modelMapper = new ModelMapper();
+    private final ClientRepository clientRepository; 
+
 
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // 1) 사용자 조회 + null 방어
         Account account = userRepository.findByUsername(username);
         if (account == null) {
-            // ← 이 예외를 던져야 Spring Security가 "인증 실패"로 처리하고 500이 안 납니다.
             throw new UsernameNotFoundException("No user with username: " + username);
         }
 
-        // 2) roles 안전 파싱 (비어있으면 ROLE_USER 기본값)
         String rolesStr = account.getRoles();
         if (rolesStr == null || rolesStr.isBlank()) {
             rolesStr = "ROLE_USER";
         }
-        // 콤마로 여러 권한 저장했다면 분리 처리 (예: "ROLE_USER,ROLE_MANAGER")
         List<GrantedAuthority> authorities = Arrays.stream(rolesStr.split(","))
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
-                .map(SimpleGrantedAuthority::new) // 반드시 "ROLE_" 접두 포함
+                .map(SimpleGrantedAuthority::new) 
                 .collect(Collectors.toList());
 
-        // 3) UserDetails 변환
-        AccountDto accountDto = modelMapper.map(account, AccountDto.class);
+        AccountDto accountDto = modelMapper.map(account, AccountDto.class);        
+        String displayName = accountDto.getUsername();
+        int clientCode = accountDto.getClient_code();
+
+        if (clientCode != 0) {
+            ClientDto clientDto = clientRepository.findByClient_code(clientCode);
+
+            if (clientDto != null 
+                && clientDto.getClient_name() != null 
+                && !clientDto.getClient_name().isBlank()) {
+
+                displayName = clientDto.getClient_name();
+            }
+        }
+
+        accountDto.setDisplayName(displayName);
         return new AccountContext(accountDto, authorities);
     }
 }

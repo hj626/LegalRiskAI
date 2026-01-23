@@ -120,7 +120,7 @@ export default function Header() {
 
                     {/* 마이페이지 */}
                     <a
-                      href="/mypage"
+                      href="/mypage/main"
                       onClick={() => setShowUserMenu(false)}
                       className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors"
                     >

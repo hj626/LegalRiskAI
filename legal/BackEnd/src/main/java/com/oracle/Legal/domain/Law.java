@@ -43,6 +43,8 @@ public class Law {
 	@CreatedDate
 	private LocalDateTime law_date;		//입력일
 	
+	private int 	law_mark;		//즐겨찾기
+	
 	//검증용 코드
 	public void changeLaw_code(int law_code) { 	
 		this.law_code = law_code;	
@@ -58,5 +60,8 @@ public class Law {
 	}
 	public void changelaw_date(LocalDateTime law_date) {
 		this.law_date = law_date;
+	}
+	public void changelaw_mark(int law_mark) {
+		this.law_mark = law_mark;
 	}
 }

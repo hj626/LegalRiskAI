@@ -22,6 +22,7 @@ public class JogiDto {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss") 
 	private LocalDateTime	jogi_date;
     private int jogi_winrate;
+    private int jogi_mark;
 	
 	public JogiDto(Jogi jogi) {
 		this.jogi_code = jogi.getJogi_code();
@@ -30,7 +31,7 @@ public class JogiDto {
 		this.jogi_output = jogi.getJogi_output();
 		this.jogi_date = jogi.getJogi_date();
 		this.jogi_winrate = jogi.getJogi_winrate();
-			
+		this.jogi_mark = jogi.getJogi_mark();
 	}
 	
 	//등록일 yyyy-MM-dd로 변경

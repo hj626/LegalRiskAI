@@ -17,9 +17,12 @@ public class LawDto {
 	private int 	 client_code;					//회원 코드
 	private String	 law_input;						//사건내용
 	private String 	 law_output;					//사건결과
+
 	
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss") 
 	private LocalDateTime	law_date;				//법적위험입력일
+    
+	private int 	 law_mark;		
 	
 	public LawDto(Law law) {
 		this.law_code = law.getLaw_code();
@@ -27,6 +30,7 @@ public class LawDto {
 		this.law_input = law.getLaw_input();
 		this.law_output = law.getLaw_output();
 		this.law_date = law.getLaw_date();
+		this.law_mark = law.getLaw_mark();
 			
 	}
 	

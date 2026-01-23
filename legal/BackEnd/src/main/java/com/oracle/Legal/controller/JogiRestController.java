@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/jogi")
-public class JogiController {
+public class JogiRestController {
 	private final JogiService jogiService;		
 	
     @PostMapping("/save")

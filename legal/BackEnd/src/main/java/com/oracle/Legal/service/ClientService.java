@@ -8,5 +8,9 @@ public interface ClientService {
 
 	ClientDto getSingleClient(int client_code);
 
+	void updateUser(ClientDto clientDto);
+
+	
+
 
 }

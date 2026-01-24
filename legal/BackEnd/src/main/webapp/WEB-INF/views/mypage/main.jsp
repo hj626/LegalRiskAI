@@ -111,7 +111,7 @@
         <div class="d-flex align-items-center gap-3 mb-3">
           <div class="avatar">👤</div>
           <div>
-            <div class="fw-bold fs-4"><%= displayName %></div>
+			<div class="fw-bold fs-4">${user.client_name}</div>
             <div class="text-muted small"><%= username %></div>
           </div>
         </div>
@@ -201,10 +201,25 @@
 								</td>
 
 					          <!-- 서비스 종류 -->
-					          <td>
-					            <span class="chip"><c:out value="${h.serviceType}"/></span>
-					          </td>
-					
+							<td>
+							  <c:choose>
+							    <c:when test="${h.serviceType == 'JOGI'}">
+							      <span class="chip" style="background:#ecfeff; color:#0e7490;">조기위험</span>
+							    </c:when>
+							    <c:when test="${h.serviceType == 'LAW'}">
+							      <span class="chip" style="background:#fef2f2; color:#b91c1c;">법적위험</span>
+							    </c:when>
+							    <c:when test="${h.serviceType == 'BOONJANG'}">
+							      <span class="chip" style="background:#fefce8; color:#a16207;">분쟁위험</span>
+							    </c:when>
+							    <c:when test="${h.serviceType == 'YUSA'}">
+							      <span class="chip" style="background:#eef2ff; color:#1d4ed8;">유사판례</span>
+							    </c:when>
+							    <c:otherwise>
+							      <span class="chip">기타</span>
+							    </c:otherwise>
+							  </c:choose>
+							</td>
 					          <!-- 관련 법률 요약 -->
 								<td class="text-muted">
 								  <c:choose>
@@ -231,7 +246,14 @@
 					
 					          <!-- 작업 -->
 					          <td>
-					            <a class="btn btn-sm btn-outline-primary disabled">상세보기</a>
+							<button type="button" class="btn btn-sm btn-outline-primary"
+							  onclick="window.open(
+							    '${pageContext.request.contextPath}/mypage/history/${h.serviceType}/${h.serviceCode}',
+							    'detail_${h.serviceType}_${h.serviceCode}',
+							    'width=900,height=700,scrollbars=yes'
+							  )">
+							  상세보기
+							</button>
 					          </td>
 					        </tr>
 					      </c:forEach>

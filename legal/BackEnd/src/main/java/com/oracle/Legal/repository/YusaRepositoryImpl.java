@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 import com.oracle.Legal.domain.Yusa;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import lombok.RequiredArgsConstructor;
 
 @Repository
@@ -19,6 +20,22 @@ public class YusaRepositoryImpl implements YusaRepository {
 	em.persist(yusa);
 	
 	return yusa;
+	}
+
+	@Override
+	public Yusa findOne(int client_code, int yusa_code) {
+	    try {
+	        return em.createQuery(
+	            "select y from Yusa y where y.client_code = :cc and y.yusa_code = :yc",
+	            Yusa.class
+	        )
+	        .setParameter("cc", client_code)
+	        .setParameter("yc", yusa_code)
+	        .getSingleResult();
+
+	    } catch (NoResultException e) {
+	        return null;
+	    }
 	}
 	
 }

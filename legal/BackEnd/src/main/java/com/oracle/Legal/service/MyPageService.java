@@ -2,6 +2,10 @@ package com.oracle.Legal.service;
 
 import java.util.*;
 import org.springframework.stereotype.Service;
+
+import com.oracle.Legal.domain.Jogi;
+import com.oracle.Legal.domain.Law;
+import com.oracle.Legal.domain.Yusa;
 import com.oracle.Legal.dto.HistoryDto;
 import com.oracle.Legal.dto.HistoryPageDto;
 import com.oracle.Legal.repository.*;
@@ -11,6 +15,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MyPageService {
 
+	private final LawRepository lawRepository;
+	private final YusaRepository yusaRepository;
+	private final JogiRepository jogiRepository;
     private final LawRepository2 lawRepository2;
     private final YusaRepository2 yusaRepository2;
     private final JogiRepository2 jogiRepository2;
@@ -79,4 +86,64 @@ public class MyPageService {
 
         return new HistoryPageDto(content, totalCount, page, size, totalPages);
     }
+
+    //법적위험 서비스코드로 찾기
+    public HistoryDto getLawHistoryDetail(int clientCode, String serviceType, Long serviceCode) {
+
+        Law l = lawRepository.findOne(clientCode, serviceCode.intValue());
+
+        return HistoryDto.builder()
+                .serviceType("LAW")
+                .serviceCode(serviceCode)
+                .analysisDate(java.sql.Timestamp.valueOf(l.getLaw_date()))
+                .input(l.getLaw_input())
+                .output(l.getLaw_output())
+                .mark(l.getLaw_mark())
+                .build();
+    }
+    //유사위험 서비스코드로 찾기
+    public HistoryDto getYusaHistoryDetail(int clientCode, String serviceType, Long serviceCode) {
+
+        Yusa l = yusaRepository.findOne(clientCode, serviceCode.intValue());
+
+        return HistoryDto.builder()
+                .serviceType("YUSA")
+                .serviceCode(serviceCode)
+                .analysisDate(java.sql.Timestamp.valueOf(l.getYusa_date()))
+                .input(l.getYusa_input())
+                .output(l.getYusa_output())
+                .mark(l.getYusa_mark())
+                .build();
+    }
+    //조기위험 서비스코드로 찾기
+    public HistoryDto getJogiHistoryDetail(int clientCode, String serviceType, Long serviceCode) {
+
+        Jogi l = jogiRepository.findOne(clientCode, serviceCode.intValue());
+
+        return HistoryDto.builder()
+                .serviceType("JOGI")
+                .serviceCode(serviceCode)
+                .analysisDate(java.sql.Timestamp.valueOf(l.getJogi_date()))
+                .input(l.getJogi_input())
+                .output(l.getJogi_output())
+                .mark(l.getJogi_mark())
+                .build();
+    }
+
+	public HistoryDto getHistoryDetail(int clientCode, String type, Long code) {
+		   String t = type.toUpperCase(); // 소문자 들어와도 대비
+
+		    if ("LAW".equals(t)) {
+		        return getLawHistoryDetail(clientCode, t, code);
+		    } else if ("YUSA".equals(t)) {
+		        return getYusaHistoryDetail(clientCode, t, code);
+		    } else if ("JOGI".equals(t)) {
+		        return getJogiHistoryDetail(clientCode, t, code);
+		    }
+
+		    throw new IllegalArgumentException("unknown type: " + type);
+    
+
+
+	}
 }

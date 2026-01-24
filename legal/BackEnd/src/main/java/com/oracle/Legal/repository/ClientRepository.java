@@ -9,4 +9,6 @@ public interface ClientRepository {
 
 	ClientDto findByClient_code(int client_code);
 
+	Client findEntityByClient_code(int client_code);
+
 }

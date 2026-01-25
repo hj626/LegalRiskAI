@@ -53,11 +53,23 @@ public class ClientServiceImpl implements ClientService {
 	    
 	}
 
+	//회원정보로 찾기 
 	@Override
 	public ClientDto getSingleClient(int client_code) {
 	return clientRepository.findByClient_code(client_code); 
 
 	}
 
+	//업데이트
+	@Override
+	public void updateUser(ClientDto clientDto) {
+	    Client client = clientRepository.findEntityByClient_code(clientDto.getClient_code());
+	    client.changeClient_name(clientDto.getClient_name());
+	    client.changeClient_email(clientDto.getClient_email());
+	    client.changeClient_tel(clientDto.getClient_tel());
+	    client.changeClient_job(clientDto.getClient_job());
+	}
+
+	
 
 }

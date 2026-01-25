@@ -37,8 +37,10 @@ public class ClientRepositoryImpl implements ClientRepository {
 		        ClientDto dto = new ClientDto();
 		        dto.setClient_code(c.getClient_code());
 		        dto.setClient_name(c.getClient_name());
-		        // ClientDto에 필요한 필드 더 있으면 여기서 계속 set 하시면 됩니다.
-
+		        dto.setClient_email(c.getClient_email());
+		        dto.setClient_tel(c.getClient_tel());
+		        dto.setClient_job(c.getClient_job());
+		        
 		        return dto;
 
 		    } catch (NoResultException e) {
@@ -46,4 +48,18 @@ public class ClientRepositoryImpl implements ClientRepository {
 
 		    }
 	}
+
+	@Override
+	public Client findEntityByClient_code(int client_code) {
+	    try {
+	        return em.createQuery(
+	            "select c from Client c where c.client_code = :client_code",
+	            Client.class
+	        ).setParameter("client_code", client_code)
+	         .getSingleResult();
+	    } catch (NoResultException e) {
+	        return null;
+	    }
+	}
+
 }

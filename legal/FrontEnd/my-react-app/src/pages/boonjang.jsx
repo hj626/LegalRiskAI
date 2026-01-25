@@ -1,11 +1,19 @@
 import React, { useState } from "react";
+import axios from "axios";
+import { Link } from "react-router-dom";
 
 export default function Boonjang() {
-  // 입력 상태
+  // Input Status
   const [inputText, setInputText] = useState("");
-  const [hasAnalyzed, setHasAnalyzed] = useState(false);
 
-  // 샘플 텍스트 입력
+  // Output Status (For DB testing)
+  const [outputText, setOutputText] = useState("");
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  // Status Message
+  const [saveStatus, setSaveStatus] = useState(null); // { success: boolean, message: string }
+
+  // Sample Text
   const handleSampleText = () => {
     setInputText(`안녕하세요, 저는 온라인 쇼핑몰에서 전자제품을 구매했습니다.
 제품 수령 후 3일 만에 청약철회를 요청했으나, 판매자가 개봉제품이라는 이유로 환불을 거부하고 있습니다.
@@ -14,71 +22,103 @@ export default function Boonjang() {
 소비자보호원에 신고할 예정이며, 필요시 법적 조치도 고려하고 있습니다.`);
   };
 
-  // 분석 실행 (현재는 더미 결과만 표시)
-  const handleAnalyze = () => {
+  // Analyze & Save Function
+  const handleAnalyzeAndSave = async () => {
     if (!inputText.trim()) {
       alert("분쟁 내용을 입력해주세요.");
       return;
     }
-    setHasAnalyzed(true);
-  };
 
-  // 더미 결과 데이터
-  const dummyResult = {
-    classification: "민사",
-    subType: "소비자",
-    summary:
-      "온라인 쇼핑몰에서 구매한 전자제품을 7일 이내에 환불 요청했으나 판매자가 개봉을 이유로 거부하고 있는 상황입니다.",
-    keywords: ["#청약철회", "#전자상거래", "#환불거부"],
-    judgment:
-      "온라인 쇼핑몰에서 구매한 전자제품을 7일 이내에 환불 요청했으나 판매자가 개봉을 이유로 거부하고 있는 상황입니다. 이는 전자상거래법상 보장되는 청약철회권과 판매자의 자체 규정이 충돌하는 분쟁입니다.",
-    relatedLaws: [
-      "전자상거래 등에서의 소비자보호에 관한 법률",
-      "소비자기본법",
-    ],
+    setSaveStatus(null);
+
+    // 1. Mock Analysis Logic (Simple rule-based or dummy)
+    // In a real scenario, this might call an AI endpoint.
+    // For now, we populate the Output field if it's empty, or use existing value.
+    let targetOutput = outputText;
+    if (!targetOutput.trim()) {
+      targetOutput = "분석된 결과: 해당 분쟁은 '민사 - 소비자' 유형으로 분류됩니다.\n\n" +
+        "주요 쟁점: 전자상거래법상 청약철회 가능 여부 및 판매자의 반품 거부 사유의 정당성.\n" +
+        "관련 법령: 전자상거래 등에서의 소비자보호에 관한 법률, 소비자기본법.";
+      setOutputText(targetOutput);
+    }
+
+    // 2. Prepare DB Save Request
+    const saveRequest = {
+      boonjang_input: inputText,
+      boonjang_output: targetOutput,
+      boonjang_mark: isFavorite ? 1 : 0
+    };
+
+    // 3. Send Request
+    try {
+      const response = await axios.post("/api/boonjang/save", saveRequest, { withCredentials: true });
+
+      if (response.status === 200 || response.status === 201) {
+        // Assuming the server returns the saved code or ID
+        const code = response.data;
+        setSaveStatus({
+          success: true,
+          message: `저장 완료! boonjang_code = ${code}`
+        });
+      }
+    } catch (error) {
+      console.error("Save Error:", error);
+      if (error.response && error.response.status === 401) {
+        setSaveStatus({
+          success: false,
+          message: "로그인이 필요합니다."
+        });
+        // Optional: Redirect to login
+      } else {
+        setSaveStatus({
+          success: false,
+          message: "저장 실패: 서버 오류가 발생했습니다."
+        });
+      }
+    }
   };
 
   return (
-    <div className="bg-gray-50">
-      {/* 페이지 헤더 */}
-       <div className="bg-white border-b px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center gap-3">
-          <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
-            <span className="text-white text-xl">📋</span>
+    <div className="bg-gray-50 min-h-screen">
+      {/* Page Header */}
+      <div className="max-w-7xl mx-auto px-6 pt-10 pb-6">
+        <div className="flex items-center gap-4">
+          <div className="flex-shrink-0">
+            <span className="text-4xl">📋</span>
           </div>
           <div>
-            <h1 className="text-xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold text-gray-900">
               분쟁 유형 분류 AI
             </h1>
-            <p className="text-sm text-gray-500">
-              분쟁 텍스트를 분석하여 Consumer, Contract, Administrative 등
-              유형을 자동 분류합니다.
+            <p className="text-gray-500 mt-1">
+              분쟁 텍스트를 분석하고 DB 저장 기능을 테스트합니다.
             </p>
           </div>
         </div>
-      </div> 
+      </div>
 
-      {/* 메인 콘텐츠 */}
-      <main className="p-6 max-w-7xl mx-auto">
+      {/* Main Content */}
+      <main className="px-6 pb-12 max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* 왼쪽: 입력 패널 */}
-          <div className="bg-white rounded-xl shadow-sm border p-6">
+
+          {/* Left Panel: Input */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col h-[600px]">
             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
               📝 분쟁 내용 입력
             </h2>
 
             <textarea
-              className="w-full h-64 p-4 border rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full flex-1 p-4 border rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50"
               placeholder="분쟁 상황을 상세히 입력해주세요..."
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
             />
 
-            <div className="flex justify-between items-center mt-2 text-sm text-gray-500">
+            <div className="flex justify-between items-center mt-3 mb-4 text-sm text-gray-500">
               <span>{inputText.length}자</span>
               <button
                 onClick={handleSampleText}
-                className="text-blue-500 hover:underline"
+                className="text-blue-500 hover:underline font-medium"
                 type="button"
               >
                 샘플 텍스트 입력
@@ -86,90 +126,64 @@ export default function Boonjang() {
             </div>
 
             <button
-              onClick={handleAnalyze}
-              className="w-full mt-4 py-3 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition flex items-center justify-center gap-2"
+              onClick={handleAnalyzeAndSave}
+              className="w-full py-4 bg-blue-500 text-white rounded-lg font-bold hover:bg-blue-600 transition shadow-sm flex items-center justify-center gap-2 text-lg"
               type="button"
             >
-              ⚡ 유형 분석 실행
+              ⚡ 유형 분석 및 저장 실행
             </button>
           </div>
 
-          {/* 오른쪽: 결과 패널 */}
-          <div className="bg-white rounded-xl shadow-sm border p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          {/* Right Panel: Output & Result */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col h-[600px]">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
               📊 분석 결과
             </h2>
 
-            {/* 결과가 없을 때 */}
-            {!hasAnalyzed && (
-              <div className="text-center py-12 text-gray-400">
-                <p className="text-4xl mb-4">📋</p>
-                <p>왼쪽에서 분쟁 내용을 입력하고</p>
-                <p>"유형 분석 실행" 버튼을 클릭하세요.</p>
+            <textarea
+              className="w-full flex-1 p-4 border rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 leading-relaxed"
+              placeholder="분석된 결과가 이곳에 표시됩니다..."
+              value={outputText}
+              onChange={(e) => setOutputText(e.target.value)}
+            />
+
+            {/* Favorites & Home Link */}
+            <div className="flex justify-between items-center mt-4 pb-2">
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="favCheck"
+                  className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  checked={isFavorite}
+                  onChange={(e) => setIsFavorite(e.target.checked)}
+                />
+                <label htmlFor="favCheck" className="text-gray-600 font-medium cursor-pointer">
+                  즐겨찾기 추가
+                </label>
+              </div>
+              <Link to="/" className="text-gray-400 hover:text-gray-600 text-sm">
+                홈으로 이동
+              </Link>
+            </div>
+
+            {/* Status Message Area */}
+            {saveStatus && (
+              <div className={`mt-3 p-4 rounded-lg text-center font-bold text-sm border ${saveStatus.success
+                ? "bg-blue-50 text-blue-600 border-blue-100"
+                : "bg-red-50 text-red-600 border-red-100"
+                }`}>
+                {saveStatus.success ? "✅ " : "❌ "}
+                {saveStatus.message}
               </div>
             )}
 
-            {/* 결과 표시 */}
-            {hasAnalyzed && (
-              <div className="space-y-6">
-                {/* 분류 유형 */}
-                <div className="flex gap-2">
-                  <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
-                    {dummyResult.classification}
-                  </span>
-                  <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
-                    {dummyResult.subType}
-                  </span>
-                </div>
-
-                {/* 요약 */}
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900">
-                    {dummyResult.summary}
-                  </h3>
-                </div>
-
-                {/* 키워드 태그 */}
-                <div className="flex flex-wrap gap-2">
-                  {dummyResult.keywords.map((keyword, index) => (
-                    <span
-                      key={index}
-                      className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm"
-                    >
-                      {keyword}
-                    </span>
-                  ))}
-                </div>
-
-                {/* 법률적 판단 */}
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                    ⚖️ 법률적 판단
-                  </h4>
-                  <p className="text-gray-700 text-sm leading-relaxed">
-                    {dummyResult.judgment}
-                  </p>
-                </div>
-
-                {/* 관련 법령 */}
-                <div>
-                  <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                    📚 관련 법령_
-                  </h4>
-                  <ul className="space-y-2">
-                    {dummyResult.relatedLaws.map((law, index) => (
-                      <li
-                        key={index}
-                        className="flex items-center gap-2 text-gray-700"
-                      >
-                        <span className="w-1 h-6 bg-blue-500 rounded" />
-                        {law}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+            {/* Placeholder for spacing when no message */}
+            {!saveStatus && (
+              <div className="mt-3 p-4 rounded-lg bg-transparent border border-transparent">
+                <span className="invisible">Placeholder</span>
               </div>
             )}
+
           </div>
         </div>
       </main>

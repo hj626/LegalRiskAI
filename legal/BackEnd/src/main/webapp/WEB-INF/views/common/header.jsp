@@ -295,12 +295,12 @@
   <% if (loggedIn) { %>
 
     <button type="button" class="user-btn" id="userBtn">
-      <span class="user-name">👋 <%= displayName %> 님</span>
+      <span class="user-name">👋 ${user.client_name} 님</span>
     </button>
 
     <div class="user-menu" id="userMenu" style="display:none;">
       <div class="menu-head">
-        <p class="name"><%= displayName %> 님</p>
+        <p class="name">${user.client_name} 님</p>
         <p class="sub"><%= loginUser.getUsername() %></p>
       </div>
 

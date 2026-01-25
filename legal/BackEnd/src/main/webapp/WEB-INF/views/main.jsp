@@ -29,12 +29,14 @@
   String ctx = request.getContextPath();
 
   String displayName = "";
+  String username = "";
+  Integer clientCode = null;
   if (loggedIn) {
-      displayName = loginUser.getClient_name();
-      if (displayName == null || displayName.isBlank()) {
-          displayName = loginUser.getUsername();
-      }
-  }
+	    try { displayName = loginUser.getClient_name(); } catch(Exception e) {}
+	    try { username = loginUser.getUsername(); } catch(Exception e) {}
+	    try { clientCode = loginUser.getClient_code(); } catch(Exception e) {}
+	    if (displayName == null || displayName.isBlank()) displayName = username;
+	  }
 %>
 
 <div class="container py-4 py-md-5">
@@ -46,7 +48,7 @@
         <div class="badge text-bg-primary-subtle text-primary-emphasis rounded-pill px-3 py-2 mb-3">⚖️ Legal Assistant</div>
 
         <% if (loggedIn) { %>
-          <h1 class="fw-bold mb-2"><%= displayName %> 님, 환영합니다</h1>
+  		<h1 class="fw-bold mb-2">${user.client_name} 님, 환영합니다</h1>
           <p class="text-muted mb-0">
             LEGALAI에서 법적 위험 분석, 분쟁 유형 분류, 유사 판례 탐색, 조기중재를 빠르게 이용할 수 있습니다.
           </p>

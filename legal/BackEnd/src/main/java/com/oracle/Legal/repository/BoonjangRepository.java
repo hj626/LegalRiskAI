@@ -1,5 +1,7 @@
 package com.oracle.Legal.repository;
 
+import java.util.List;
+
 import com.oracle.Legal.domain.Boonjang;
 
 /**
@@ -17,4 +19,6 @@ public interface BoonjangRepository {
 	// 분쟁위험 찾기
 	Boonjang findOne(int clientCode, int intValue);
 
+	// 분쟁위험 리스트
+	List<Boonjang> findHistory(int clientCode);
 }

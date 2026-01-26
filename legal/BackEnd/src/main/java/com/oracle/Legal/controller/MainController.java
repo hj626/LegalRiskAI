@@ -5,6 +5,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import com.oracle.Legal.dto.AccountDto;
+import com.oracle.Legal.dto.ClientDto;
+import com.oracle.Legal.service.ClientService;
+
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
@@ -12,23 +16,40 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MainController {
 	
-	//세션 확인용
-	@GetMapping("/")
-	public String mainPage(Model model, HttpSession session) {
+	    private final ClientService clientService;
 
-	    System.out.println("==== SESSION CHECK (MAIN) ====");
-	    System.out.println("session id = " + session.getId());
+	
+	 // 세션 확인용
+	    @GetMapping("/")
+	    public String mainPage(Model model, HttpSession session) {
 
-	    Integer clientCode = (Integer) session.getAttribute("client_code");
-	    System.out.println("client_code = " + clientCode);
+	        Integer clientCode = (Integer) session.getAttribute("client_code");
 
-	    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-	    System.out.println("auth = " + auth);
-	    System.out.println("principal = " + (auth != null ? auth.getPrincipal() : null));
-	    System.out.println("=============================");
+	        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-	    return "main";
-	}
+	        if (auth != null && auth.isAuthenticated()
+	                && auth.getPrincipal() instanceof AccountDto) {
+
+	            AccountDto account = (AccountDto) auth.getPrincipal();
+
+	            // client_code = null일때
+	            if (clientCode == null) {
+	                clientCode = account.getClient_code();   
+	                if (clientCode != null) {
+	                    session.setAttribute("client_code", clientCode);
+	                }
+	            }
+
+	            // 비정상 로그인 상태 
+	            if (clientCode != null) {
+	                ClientDto user = clientService.getSingleClient(clientCode);
+	                model.addAttribute("user", user);
+	            }
+	        }
+
+	        return "main";
+	    }
+
 
 	
 }

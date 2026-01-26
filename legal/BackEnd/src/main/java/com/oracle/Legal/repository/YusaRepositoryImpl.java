@@ -1,5 +1,7 @@
 package com.oracle.Legal.repository;
 
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 
 import com.oracle.Legal.domain.Yusa;
@@ -37,5 +39,14 @@ public class YusaRepositoryImpl implements YusaRepository {
 	        return null;
 	    }
 	}
-	
+
+    @Override
+    public List<Yusa> findHistory(int clientCode) {
+        return em.createQuery(
+            "select y from Yusa y where y.client_code = :cc order by y.yusa_date desc",
+            Yusa.class
+        )
+        .setParameter("cc", clientCode)
+        .getResultList();
+    }
 }

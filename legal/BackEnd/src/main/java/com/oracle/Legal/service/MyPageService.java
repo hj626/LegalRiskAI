@@ -18,30 +18,27 @@ public class MyPageService {
 	private final LawRepository lawRepository;
 	private final YusaRepository yusaRepository;
 	private final JogiRepository jogiRepository;
-    private final LawRepository2 lawRepository2;
-    private final YusaRepository2 yusaRepository2;
-    private final JogiRepository2 jogiRepository2;
     private final BoonjangRepository boonjangRepository;
-    private final BoonjangRepository2 boonjangRepository2;
 
     public List<HistoryDto> getAllHistory(int client_code) {
 
         List<HistoryDto> list = new ArrayList<>();
 
-        // LAW
-        lawRepository2.findHistory(client_code).forEach(l -> {
-            list.add(HistoryDto.builder()
-                .serviceType("LAW")
-                .serviceCode((long) l.getLaw_code())
-                .analysisDate(java.sql.Timestamp.valueOf(l.getLaw_date()))
-                .input(l.getLaw_input())
-                .output(l.getLaw_output())
-                .mark(l.getLaw_mark())
-                .build());
-        });
+	     // LAW
+	        lawRepository.findHistory(client_code).forEach(l -> {
+	            list.add(HistoryDto.builder()
+	                .serviceType("LAW")
+	                .serviceCode((long) l.getLaw_code())
+	                .analysisDate(java.sql.Timestamp.valueOf(l.getLaw_date()))
+	                .input(l.getLaw_input())
+	                .output(l.getLaw_output())
+	                .mark(l.getLaw_mark())
+	                .build());
+	        });
+
 
         // YUSA
-        yusaRepository2.findHistory(client_code).forEach(y -> {
+        yusaRepository.findHistory(client_code).forEach(y -> {
             list.add(HistoryDto.builder()
                 .serviceType("YUSA")
                 .serviceCode((long) y.getYusa_code())
@@ -53,7 +50,7 @@ public class MyPageService {
         });
 
         // JOGI
-        jogiRepository2.findHistory(client_code).forEach(j -> {
+        jogiRepository.findHistory(client_code).forEach(j -> {
             list.add(HistoryDto.builder()
                 .serviceType("JOGI")
                 .serviceCode((long) j.getJogi_code())
@@ -65,7 +62,7 @@ public class MyPageService {
         });
 
         // BOONJANG
-        boonjangRepository2.findHistory(client_code).forEach(b -> {
+        boonjangRepository.findHistory(client_code).forEach(b -> {
             list.add(HistoryDto.builder()
                 .serviceType("BOONJANG")
                 .serviceCode((long) b.getBoonjang_code())

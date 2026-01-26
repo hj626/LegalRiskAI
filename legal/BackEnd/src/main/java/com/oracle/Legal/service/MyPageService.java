@@ -21,6 +21,8 @@ public class MyPageService {
     private final LawRepository2 lawRepository2;
     private final YusaRepository2 yusaRepository2;
     private final JogiRepository2 jogiRepository2;
+    private final BoonjangRepository boonjangRepository;
+    private final BoonjangRepository2 boonjangRepository2;
 
     public List<HistoryDto> getAllHistory(int client_code) {
 
@@ -59,6 +61,18 @@ public class MyPageService {
                 .input(j.getJogi_input())
                 .output(j.getJogi_output())
                 .mark(j.getJogi_mark())
+                .build());
+        });
+
+        // BOONJANG
+        boonjangRepository2.findHistory(client_code).forEach(b -> {
+            list.add(HistoryDto.builder()
+                .serviceType("BOONJANG")
+                .serviceCode((long) b.getBoonjang_code())
+                .analysisDate(java.sql.Timestamp.valueOf(b.getBoonjang_date()))
+                .input(b.getBoonjang_input())
+                .output(b.getBoonjang_output())
+                .mark(b.getBoonjang_mark())
                 .build());
         });
 
@@ -130,6 +144,21 @@ public class MyPageService {
                 .build();
     }
 
+    //분쟁위험 서비스코드로 찾기
+    public HistoryDto getBoonjangHistoryDetail(int clientCode, String serviceType, Long serviceCode) {
+
+        com.oracle.Legal.domain.Boonjang l = boonjangRepository.findOne(clientCode, serviceCode.intValue());
+
+        return HistoryDto.builder()
+                .serviceType("BOONJANG")
+                .serviceCode(serviceCode)
+                .analysisDate(java.sql.Timestamp.valueOf(l.getBoonjang_date()))
+                .input(l.getBoonjang_input())
+                .output(l.getBoonjang_output())
+                .mark(l.getBoonjang_mark())
+                .build();
+    }
+
 	public HistoryDto getHistoryDetail(int clientCode, String type, Long code) {
 		   String t = type.toUpperCase(); // 소문자 들어와도 대비
 
@@ -139,6 +168,8 @@ public class MyPageService {
 		        return getYusaHistoryDetail(clientCode, t, code);
 		    } else if ("JOGI".equals(t)) {
 		        return getJogiHistoryDetail(clientCode, t, code);
+		    } else if ("BOONJANG".equals(t)) {
+		        return getBoonjangHistoryDetail(clientCode, t, code);
 		    }
 
 		    throw new IllegalArgumentException("unknown type: " + type);

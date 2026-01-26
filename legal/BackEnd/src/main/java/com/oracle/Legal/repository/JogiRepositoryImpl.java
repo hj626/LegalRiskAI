@@ -1,5 +1,7 @@
 package com.oracle.Legal.repository;
 
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 
 import com.oracle.Legal.domain.Jogi;
@@ -37,5 +39,13 @@ public class JogiRepositoryImpl implements JogiRepository {
 	    }
 	}
 
-
+    @Override
+    public List<Jogi> findHistory(int clientCode) {
+        return em.createQuery(
+            "select j from Jogi j where j.client_code = :cc order by j.jogi_date desc",
+            Jogi.class
+        )
+        .setParameter("cc", clientCode)
+        .getResultList();
+    }
 }

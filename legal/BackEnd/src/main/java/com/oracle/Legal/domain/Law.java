@@ -22,7 +22,7 @@ import lombok.Data;
 @SequenceGenerator (
 		name = "law_seq",
 		sequenceName = "LAW_SEQ",
-		initialValue = 100000,
+		initialValue = 200000,
 		allocationSize = 1
 		)
 

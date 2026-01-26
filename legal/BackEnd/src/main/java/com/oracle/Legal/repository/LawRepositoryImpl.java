@@ -1,5 +1,7 @@
 package com.oracle.Legal.repository;
 
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 
 import com.oracle.Legal.domain.Law;
@@ -35,6 +37,17 @@ public class LawRepositoryImpl implements LawRepository {
 	        return null;
 	    }
 	}
+
+
+    @Override
+    public List<Law> findHistory(int clientCode) {
+        return em.createQuery(
+            "select l from Law l where l.client_code = :cc order by l.law_date desc",
+            Law.class
+        )
+        .setParameter("cc", clientCode)
+        .getResultList();
+    }
 
 
 

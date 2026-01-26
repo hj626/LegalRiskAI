@@ -1,5 +1,7 @@
 package com.oracle.Legal.repository;
 
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 
 import com.oracle.Legal.domain.Boonjang;
@@ -42,4 +44,14 @@ public class BoonjangRepositoryImpl implements BoonjangRepository {
 	    }
 	}
 
+    @Override
+    public List<Boonjang> findHistory(int clientCode) {
+        return em.createQuery(
+            "select b from Boonjang b where b.client_code = :cc order by b.boonjang_date desc",
+            Boonjang.class
+        )
+        .setParameter("cc", clientCode)
+        .getResultList();
+    }
+	
 }

@@ -21,17 +21,36 @@
     box-shadow: 0 12px 34px rgba(0,0,0,.06);
   }
   .avatar{
-    width: 72px; height: 72px;
+    width: 72px;
+    height: 72px;
     border-radius: 22px;
     background: #eef2ff;
-    display:flex; align-items:center; justify-content:center;
+    display:flex;
+    align-items:center;
+    justify-content:center;
     font-size: 34px;
     border: 1px solid rgba(15, 23, 42, .06);
   }
-  .kv { display:flex; justify-content:space-between; padding:10px 0; border-top:1px solid #f1f5f9; font-size:14px; }
-  .kv:first-child{ border-top:0; padding-top:0; }
-  .kv .k{ color:#64748b; } .kv .v{ font-weight:600; color:#0f172a; }
+  .kv {
+    display:flex;
+    justify-content:space-between;
+    padding:10px 0;
+    border-top:1px solid #f1f5f9;
+    font-size:14px;
+  }
+  .kv:first-child{
+    border-top:0;
+    padding-top:0;
+  }
+  .kv .k{ color:#64748b; }
+  .kv .v{ font-weight:600; color:#0f172a; }
   .help{ font-size:12px; color:#64748b; }
+
+  .toggle-btn{
+    border: 1px solid rgba(15, 23, 42, .08);
+    border-radius: 14px;
+    background: #f8fafc;
+  }
 </style>
 </head>
 
@@ -71,7 +90,7 @@
         <div class="d-flex align-items-center gap-3 mb-3">
           <div class="avatar">👤</div>
           <div>
-			<div class="fw-bold fs-4">${user.client_name}</div>
+            <div class="fw-bold fs-4">${user.client_name}</div>
             <div class="text-muted small"><%= username %></div>
           </div>
         </div>
@@ -92,56 +111,150 @@
     <!-- RIGHT -->
     <div class="col-12 col-lg-8">
       <div class="glass p-4">
-        <div class="mb-3">
-          <div class="fw-bold fs-4">회원정보 수정</div>
-          <div class="text-muted small">이름/이메일/전화번호/직업을 변경할 수 있습니다.</div>
-        </div>
 
         <!-- 메시지(선택) -->
         <c:if test="${not empty msg}">
           <div class="alert alert-info py-2 mb-3">${msg}</div>
         </c:if>
 
-        <!-- ✅ 아직 컨트롤러 없어도 form 구조부터 만들어두기 -->
-        <form method="post" action="${pageContext.request.contextPath}/mypage/user/update" class="row g-3">
-
-          <!-- PK는 수정 금지 (hidden) -->
-          <input type="hidden" name="client_code" value="<%= clientCode != null ? clientCode : 0 %>"/>
-
-          <div class="col-md-6">
-            <label class="form-label">이름</label>
-            <input type="text" class="form-control" name="client_name"
-                   value="${user.client_name != null ? user.client_name : ''}">
-            <div class="help mt-1">이름은 꼭 입력해주세요.</div>
+        <!-- ✅ 토글 1: 회원정보 수정 -->
+        <button class="btn w-100 text-start d-flex justify-content-between align-items-center px-3 py-3 toggle-btn"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#profileCollapse"
+                aria-expanded="true"
+                aria-controls="profileCollapse">
+          <div>
+            <div class="fw-bold fs-4">회원정보 수정</div>
+            <div class="text-muted small">이름/이메일/전화번호/직업을 변경할 수 있습니다.</div>
           </div>
+          <span class="fs-4">⌄</span>
+        </button>
 
-          <div class="col-md-6">
-            <label class="form-label">이메일</label>
-            <input type="email" class="form-control" name="client_email"
-                   value="${user.client_email != null ? user.client_email : ''}">
-          </div>
+        <div class="collapse show mt-3" id="profileCollapse">
+          <form method="post"
+                action="${pageContext.request.contextPath}/mypage/user/update"
+                class="row g-3">
 
-          <div class="col-md-6">
-            <label class="form-label">전화번호</label>
-            <input type="text" class="form-control" name="client_tel"
-                   value="${user.client_tel != null ? user.client_tel : ''}">
-          </div>
+            <input type="hidden"
+                   name="client_code"
+                   value="<%= clientCode != null ? clientCode : 0 %>"/>
 
-          <div class="col-md-6">
-            <label class="form-label">직업</label>
-            <input type="text" class="form-control" name="client_job"
-                   value="${user.client_job != null ? user.client_job : ''}">
-          </div>
-
-          <div class="col-12">
-            <hr class="my-2">
-            <div class="d-flex gap-2 justify-content-end">
-              <a class="btn btn-outline-secondary" href="${pageContext.request.contextPath}/mypage/user">취소</a>
-              <button type="submit" class="btn btn-primary">저장</button>
+            <div class="col-12">
+              <label class="form-label">이름</label>
+              <input type="text"
+                     class="form-control"
+                     name="client_name"
+                     value="${user.client_name != null ? user.client_name : ''}">
+              <div class="help mt-1">이름은 꼭 입력해주세요.</div>
             </div>
-          </div>
 
-        </form>
+            <div class="col-12">
+              <label class="form-label">이메일</label>
+              <input type="email"
+                     class="form-control"
+                     name="client_email"
+                     value="${user.client_email != null ? user.client_email : ''}">
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">전화번호</label>
+              <input type="text"
+                     class="form-control"
+                     name="client_tel"
+                     value="${user.client_tel != null ? user.client_tel : ''}">
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">직업</label>
+              <input type="text"
+                     class="form-control"
+                     name="client_job"
+                     value="${user.client_job != null ? user.client_job : ''}">
+            </div>
+
+            <div class="col-12">
+              <hr class="my-2">
+              <div class="d-flex gap-2 justify-content-end">
+                <a class="btn btn-outline-secondary"
+                   href="${pageContext.request.contextPath}/mypage/user">취소</a>
+                <button type="submit"
+                        class="btn btn-primary">저장</button>
+              </div>
+            </div>
+
+          </form>
+        </div>
+
+        <hr class="my-4">
+
+        <!-- ✅ 토글 2: 비밀번호 변경 -->
+        <button class="btn w-100 text-start d-flex justify-content-between align-items-center px-3 py-3 toggle-btn"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#passwordCollapse"
+                aria-expanded="false"
+                aria-controls="passwordCollapse">
+          <div>
+            <div class="fw-bold fs-4">비밀번호 변경</div>
+            <div class="text-muted small">현재 비밀번호 확인 후 새 비밀번호로 변경할 수 있습니다.</div>
+          </div>
+          <span class="fs-4">⌄</span>
+        </button>
+
+        <div class="collapse mt-3" id="passwordCollapse">
+
+          <c:if test="${not empty pwMsg}">
+            <div class="alert alert-info py-2 mb-3">${pwMsg}</div>
+          </c:if>
+
+          <c:if test="${not empty pwErr}">
+            <div class="alert alert-danger py-2 mb-3">${pwErr}</div>
+          </c:if>
+
+          <form method="post"
+                action="${pageContext.request.contextPath}/mypage/password/change"
+                class="row g-3">
+
+            <div class="col-12">
+              <label class="form-label">현재 비밀번호</label>
+              <input type="password"
+                     class="form-control"
+                     name="currentPassword"
+                     required>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">새 비밀번호</label>
+              <input type="password"
+                     class="form-control"
+                     name="newPassword"
+                     required>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">새 비밀번호 확인</label>
+              <input type="password"
+                     class="form-control"
+                     name="confirmPassword"
+                     required>
+            </div>
+
+            <div class="col-12">
+              <div class="help">
+                비밀번호는 영문/숫자 조합 8자 이상을 권장합니다.
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="d-flex gap-2 justify-content-end">
+                <button type="submit"
+                        class="btn btn-outline-primary">비밀번호 변경</button>
+              </div>
+            </div>
+
+          </form>
+        </div>
 
       </div>
     </div>

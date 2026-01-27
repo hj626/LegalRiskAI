@@ -128,7 +128,7 @@
         </div>
 
         <div class="d-grid gap-2 mt-4">
-          <a class="btn btn-outline-primary" href="<%= ctx %>/mypage/user">회원정보 조회</a>
+          <a class="btn btn-outline-primary" href="<%= ctx %>/mypage/user">회원정보 수정</a>
         </div>
       </div>
     </div>

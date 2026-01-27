@@ -27,35 +27,12 @@ public class ClientController {
     return "login/joinPage";           
 	}
 	
-	//비밀번호 찾기 페이지 이동
-	@GetMapping("/findPassword")
-	public String findPasswordPage(Model model) {
-	System.out.println("비밀번호 찾기 페이지 실행중");
-    return "login/findPassword";           
-	}
-	
 	@PostMapping("/saveInform")
 	public String saveInform (ClientDto clientDto) { 
 	clientService.informSave(clientDto);
 	System.out.println("회원가입 정보 전송");
     return "redirect:/login";          
 	}
-	
-	
-	/*
-	 * @GetMapping("/session-check")
-	 * 
-	 * @ResponseBody public String sessionCheck(HttpSession session) {
-	 * 
-	 * Object clientCode = session.getAttribute("client_code");
-	 * 
-	 * System.out.println("==== SESSION CHECK ====");
-	 * System.out.println("session id = " + session.getId());
-	 * System.out.println("client_code = " + clientCode);
-	 * System.out.println("======================");
-	 * 
-	 * return "client_code = " + clientCode; }
-	 */
 	
 	
 }

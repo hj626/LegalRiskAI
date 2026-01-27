@@ -61,5 +61,21 @@ public class ClientRepositoryImpl implements ClientRepository {
 	        return null;
 	    }
 	}
+	
+	@Override
+	public Client findEntityByNameAndEmail(String client_name, String client_email) {
+	    try {
+	        return em.createQuery(
+	            "select c from Client c where c.client_name = :name and c.client_email = :email",
+	            Client.class
+	        )
+	        .setParameter("name", client_name)
+	        .setParameter("email", client_email)
+	        .getSingleResult();
+	    } catch (NoResultException e) {
+	        return null;
+	    }
+	}
+
 
 }

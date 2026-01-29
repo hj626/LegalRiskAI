@@ -1,5 +1,8 @@
 package com.oracle.Legal.repository;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Repository;
 
 import com.oracle.Legal.domain.Client;
@@ -79,5 +82,34 @@ public class ClientRepositoryImpl implements ClientRepository {
 	    }
 	}
 
+    @Override
+    public int countClients() {
+        Long cnt = em.createQuery("select count(c) from Client c", Long.class)
+                     .getSingleResult();
+        return cnt.intValue();
+    }
+
+
+	@Override
+	public List<ClientDto> findClientsPage(int offset, int size) {
+	    List<Client> list = em.createQuery(
+	            "select c from Client c order by c.client_code asc",
+	            Client.class
+	    )
+	    .setFirstResult(offset)
+	    .setMaxResults(size)
+	    .getResultList();
+	
+	    return list.stream().map(c -> {
+	        ClientDto dto = new ClientDto();
+	        dto.setClient_code(c.getClient_code());
+	        dto.setClient_name(c.getClient_name());
+	        dto.setClient_email(c.getClient_email());
+	        dto.setClient_tel(c.getClient_tel());
+	        dto.setClient_job(c.getClient_job());
+	        dto.setClient_is_del(c.getClient_is_del()); 
+	        return dto;
+	    }).collect(Collectors.toList());
+	}
 
 }

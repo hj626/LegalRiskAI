@@ -1,5 +1,7 @@
 package com.oracle.Legal.service;
 
+import java.util.List;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -7,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.oracle.Legal.domain.Account;
 import com.oracle.Legal.domain.Client;
 import com.oracle.Legal.dto.ClientDto;
+import com.oracle.Legal.dto.PageDto;
 import com.oracle.Legal.repository.AccountRepository;
 import com.oracle.Legal.repository.ClientRepository;
 
@@ -82,6 +85,23 @@ public class ClientServiceImpl implements ClientService {
         .setParameter("clientCode", clientCode)
         .executeUpdate();
     }
-	
+
+    @Override
+    public PageDto<ClientDto> getClientPage(int page, int size) {
+        int safePage = Math.max(page, 1);
+        int safeSize = Math.min(Math.max(size, 5), 50);
+
+        int totalCount = clientRepository.countClients();
+        int totalPages = (int) Math.ceil((double) totalCount / safeSize);
+        
+        if (totalPages > 0 && safePage > totalPages) safePage = totalPages;
+
+        int offset = (safePage - 1) * safeSize;
+
+        List<ClientDto> list = clientRepository.findClientsPage(offset, safeSize);
+
+        return new PageDto<>(list, totalCount, safePage, safeSize, totalPages);
+    }
+
 
 }

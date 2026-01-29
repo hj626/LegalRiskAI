@@ -1,6 +1,6 @@
 package com.oracle.Legal.service;
-
 import com.oracle.Legal.dto.ClientDto;
+import com.oracle.Legal.dto.PageDto;
 
 public interface ClientService {
 
@@ -12,6 +12,7 @@ public interface ClientService {
 
 	void clientDel(int clientCode);
 
+	PageDto<ClientDto> getClientPage(int page, int size);
 	
 
 

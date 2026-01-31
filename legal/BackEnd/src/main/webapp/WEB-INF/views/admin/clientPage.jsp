@@ -54,6 +54,7 @@
 
                                 <tbody>
                                     <c:forEach var="c" items="${clientList}">
+                                      <c:if test="${c.client_code != 1000}">
                                         <tr>
                                             <td>${c.client_code}</td>
                                             <td>${c.client_name}</td>
@@ -72,6 +73,7 @@
                                                 </c:choose>
                                             </td>
                                         </tr>
+                                        </c:if>
                                     </c:forEach>
                                 </tbody>
                             </table>

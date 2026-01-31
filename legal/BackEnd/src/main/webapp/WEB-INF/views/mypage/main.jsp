@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="org.springframework.security.core.context.SecurityContextHolder" %>
 <%@ page import="org.springframework.security.core.Authentication" %>
+<%@ page import="org.springframework.security.core.GrantedAuthority" %>
 <%@ page import="com.oracle.Legal.dto.AccountDto" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -64,15 +65,14 @@
     color:#64748b;
     font-weight:700;
     white-space: nowrap;
-    position: relative;    /* ✅ 클릭 막힘 방지 */
-    z-index: 5;            /* ✅ 클릭 막힘 방지 */
+    position: relative;
+    z-index: 5;
   }
   .table tbody td{
     font-size: 14px;
     vertical-align: middle;
   }
 
-  /* ★ 버튼 */
   .star-btn { border:0; background:transparent; padding:0; cursor:pointer; }
 </style>
 </head>
@@ -93,11 +93,23 @@
   String username = "";
   Integer clientCode = null;
 
+  boolean isAdmin = false; // ✅ 관리자 여부
+
   if (loggedIn) {
     try { displayName = loginUser.getClient_name(); } catch(Exception e) {}
     try { username = loginUser.getUsername(); } catch(Exception e) {}
     try { clientCode = loginUser.getClient_code(); } catch(Exception e) {}
     if (displayName == null || displayName.isBlank()) displayName = username;
+
+    // ✅ SecurityConfig 기준: ROLE_ADMIN
+    if (auth.getAuthorities() != null) {
+      for (GrantedAuthority ga : auth.getAuthorities()) {
+        if ("ROLE_ADMIN".equals(ga.getAuthority())) {
+          isAdmin = true;
+          break;
+        }
+      }
+    }
   }
 %>
 
@@ -130,9 +142,15 @@
           </div>
         </div>
 
+        <!-- ✅ 여기만 수정: 관리자면 /admin/main, 아니면 /mypage/user -->
         <div class="d-grid gap-2 mt-4">
-          <a class="btn btn-outline-primary" href="<%= ctx %>/mypage/user">회원정보 수정</a>
+          <% if (isAdmin) { %>
+            <a class="btn btn-outline-primary" href="<%= ctx %>/admin/main">회원 관리</a>
+          <% } else { %>
+            <a class="btn btn-outline-primary" href="<%= ctx %>/mypage/user">회원정보 수정</a>
+          <% } %>
         </div>
+
       </div>
     </div>
 
@@ -157,16 +175,13 @@
             </select>
           </div>
 
-          <!-- 삭제 버튼은 bulkForm submit -->
           <button type="submit" form="bulkForm" class="btn btn-sm btn-outline-danger"
                   onclick="return confirm('선택한 항목을 삭제하시겠습니까?');">
             선택 삭제
           </button>
         </div>
 
-        <!-- ✅ 삭제용 FORM 하나만 사용 (중첩 form 금지) -->
         <form id="bulkForm" method="post" action="${pageContext.request.contextPath}/mypage/history/delete">
-          <!-- 현재 페이지/필터 유지 -->
           <input type="hidden" name="page" value="${page}">
           <input type="hidden" name="serviceTypeFilter" value="${param.serviceType}">
 
@@ -197,12 +212,10 @@
                   <c:otherwise>
                     <c:forEach var="h" items="${historyList}">
                       <tr>
-                        <!-- 체크 -->
                         <td class="text-center">
                           <input type="checkbox" name="selectedKeys" value="${h.serviceType}:${h.serviceCode}">
                         </td>
 
-                        <!-- 작성일자 -->
                         <td class="text-muted" style="white-space:nowrap;">
                           <c:choose>
                             <c:when test="${not empty h.analysisDate}">
@@ -212,7 +225,6 @@
                           </c:choose>
                         </td>
 
-                        <!-- 사건 요약 -->
                         <td>
                           <c:choose>
                             <c:when test="${fn:length(h.input) > 10}">
@@ -224,7 +236,6 @@
                           </c:choose>
                         </td>
 
-                        <!-- 서비스 종류 -->
                         <td>
                           <c:choose>
                             <c:when test="${h.serviceType == 'JOGI'}">
@@ -245,7 +256,6 @@
                           </c:choose>
                         </td>
 
-                        <!-- 관련 법률 요약 -->
                         <td class="text-muted">
                           <c:choose>
                             <c:when test="${fn:length(h.output) > 10}">
@@ -257,7 +267,6 @@
                           </c:choose>
                         </td>
 
-                        <!-- ★ 토글 (✅ form 중첩 제거: JS로 POST) -->
                         <td class="text-center">
                           <button type="button" class="star-btn"
                                   onclick="toggleMark('${h.serviceType}', '${h.serviceCode}')"
@@ -273,7 +282,6 @@
                           </button>
                         </td>
 
-                        <!-- 작업 -->
                         <td>
                           <button type="button" class="btn btn-sm btn-outline-primary"
                             onclick="window.open(
@@ -293,7 +301,6 @@
           </div>
         </form>
 
-        <!-- 페이징 (page + serviceType 유지) -->
         <div class="d-flex justify-content-between align-items-center mt-3">
           <div class="text-muted small">총 ${totalCount}건</div>
 
@@ -328,7 +335,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-/** ✅ ★ 토글: 현재 page/serviceType 유지해서 POST */
 function toggleMark(serviceType, serviceCode) {
   const f = document.createElement("form");
   f.method = "post";
@@ -356,7 +362,6 @@ function toggleMark(serviceType, serviceCode) {
   f.submit();
 }
 
-/** ✅ 체크박스 전체선택 */
 document.addEventListener("DOMContentLoaded", function () {
   const checkAll = document.getElementById("checkAll");
   if (!checkAll) return;

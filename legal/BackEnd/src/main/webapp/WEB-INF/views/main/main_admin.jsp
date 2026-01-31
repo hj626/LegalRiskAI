@@ -31,7 +31,7 @@
 
       <div class="d-flex gap-2">
         <a class="btn btn-primary" href="<%= ctx %>/admin/main">운영자 페이지</a>
-        <a class="btn btn-outline-primary" href="<%= ctx %>/yusa">유사판례</a>
+        <a class="btn btn-outline-primary" href="<%= ctx %>/ai-analysis">기능테스트</a>
       </div>
     </div>
   </div>
@@ -59,31 +59,14 @@
           <div class="d-flex align-items-center gap-2 mb-3">
             <div class="icon-badge">📚</div>
             <div>
-              <div class="fw-bold">유사판례</div>
-              <div class="text-muted small">기능 확인</div>
+              <div class="fw-bold">기능 확인</div>
+              <div class="text-muted small">기능 테스트를 실행합니다</div>
             </div>
           </div>
-          <p class="text-muted mb-3">유사판례 기능을 바로 실행합니다.</p>
-          <a class="btn btn-outline-primary w-100" href="<%= ctx %>/yusa">열기</a>
+          <p class="text-muted mb-3">기능 테스트</p>
+          <a class="btn btn-outline-primary w-100" href="<%= ctx %>/ai-analysis">열기</a>
         </div>
       </div>
     </div>
-
-    <div class="col-md-6 col-lg-4">
-      <div class="card feature-card h-100">
-        <div class="card-body">
-          <div class="d-flex align-items-center gap-2 mb-3">
-            <div class="icon-badge">👤</div>
-            <div>
-              <div class="fw-bold">마이페이지(참고)</div>
-              <div class="text-muted small">일반 화면</div>
-            </div>
-          </div>
-          <p class="text-muted mb-3">필요 시 일반 사용자 페이지 확인.</p>
-          <a class="btn btn-outline-primary w-100" href="<%= ctx %>/mypage/main">열기</a>
-        </div>
-      </div>
-    </div>
-  </div>
 
 </div>

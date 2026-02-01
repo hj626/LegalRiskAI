@@ -77,6 +77,7 @@ public class ClientServiceImpl implements ClientService {
 	}
 
 
+	//탈퇴처리 
     @Override
     public void clientDel(int clientCode) {
         em.createQuery(
@@ -86,6 +87,7 @@ public class ClientServiceImpl implements ClientService {
         .executeUpdate();
     }
 
+    //클라이언트 페이지 페이징
     @Override
     public PageDto<ClientDto> getClientPage(int page, int size) {
         int safePage = Math.max(page, 1);
@@ -102,6 +104,15 @@ public class ClientServiceImpl implements ClientService {
 
         return new PageDto<>(list, totalCount, safePage, safeSize, totalPages);
     }
+    
+    //회원 탈퇴 처리 
+    public void updateClientIsDel(int clientCode, int clientIsDel) {
+        Client client = clientRepository.findEntityByClient_code(clientCode);
 
+        if (client == null) {
+            throw new IllegalArgumentException("존재하지 않는 회원입니다.");
+        }
 
+        client.setClient_is_del(clientIsDel);
+    }
 }

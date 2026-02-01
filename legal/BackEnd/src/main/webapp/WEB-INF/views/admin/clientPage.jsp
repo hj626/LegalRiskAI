@@ -43,36 +43,44 @@
                             <table class="table table-hover align-middle mb-0">
                                 <thead class="table-light">
                                     <tr>
-                                        <th style="width: 90px;">코드</th>
+                                        <th style="width: 90px;">회원코드</th>
                                         <th>이름</th>
                                         <th>이메일</th>
                                         <th style="width: 160px;">전화</th>
                                         <th style="width: 140px;">직업</th>
                                         <th style="width: 110px;">회원여부</th>
+                                        <th style="width: 90px;">회원상세</th>
                                     </tr>
                                 </thead>
 
                                 <tbody>
                                     <c:forEach var="c" items="${clientList}">
-                                      <c:if test="${c.client_code != 1000}">
-                                        <tr>
-                                            <td>${c.client_code}</td>
-                                            <td>${c.client_name}</td>
-                                            <td>${c.client_email}</td>
-                                            <td>${c.client_tel}</td>
-                                            <td>${c.client_job}</td>
+                                        <c:if test="${c.client_code != 1000}">
+                                            <tr>
+                                                <td>${c.client_code}</td>
+                                                <td>${c.client_name}</td>
+                                                <td>${c.client_email}</td>
+                                                <td>${c.client_tel}</td>
+                                                <td>${c.client_job}</td>
 
-                                            <td>
-                                                <c:choose>
-                                                    <c:when test="${c.client_is_del == 1}">
-                                                        <span class="badge text-bg-secondary">탈퇴</span>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <span class="badge text-bg-success">정상</span>
-                                                    </c:otherwise>
-                                                </c:choose>
-                                            </td>
-                                        </tr>
+                                                <td>
+                                                    <c:choose>
+                                                        <c:when test="${c.client_is_del == 1}">
+                                                            <span class="badge text-bg-secondary">탈퇴</span>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="badge text-bg-success">정상</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </td>
+
+                                                <td>
+													<a class="btn btn-sm btn-outline-primary"
+													   href="${pageContext.request.contextPath}/admin/client/${c.client_code}?page=${page}&size=${size}">
+													   상세보기 
+													</a>
+                                                </td>
+                                            </tr>
                                         </c:if>
                                     </c:forEach>
                                 </tbody>

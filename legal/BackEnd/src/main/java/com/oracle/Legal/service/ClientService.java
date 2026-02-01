@@ -13,6 +13,8 @@ public interface ClientService {
 	void clientDel(int clientCode);
 
 	PageDto<ClientDto> getClientPage(int page, int size);
+
+	void updateClientIsDel(int clientCode, int clientIsDel);
 	
 
 

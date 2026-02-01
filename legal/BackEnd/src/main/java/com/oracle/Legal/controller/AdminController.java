@@ -3,8 +3,11 @@ package com.oracle.Legal.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.oracle.Legal.dto.ClientDto;
 import com.oracle.Legal.dto.PageDto;
@@ -37,5 +40,25 @@ public class AdminController {
         model.addAttribute("totalPages", result.getTotalPages());
 
         return "admin/clientPage";
+    }
+    
+    @GetMapping("/client/{clientCode}")
+    public String clientDetail(@PathVariable("clientCode") int clientCode, Model model) {
+        ClientDto client = clientService.getSingleClient(clientCode);
+        model.addAttribute("client", client);
+        System.out.println("상세보기페이지 실행");
+        return "admin/clientDetail";
+    }
+
+    @PostMapping("/client/{clientCode}/status")
+    public String updateClientStatus(
+            @PathVariable("clientCode") int clientCode,
+            @RequestParam("client_is_del") int clientIsDel,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size
+    ) {
+        clientService.updateClientIsDel(clientCode, clientIsDel);
+        System.out.println("상태수정완료 ");
+        return "redirect:/admin/main?page=" + page + "&size=" + size;
     }
 }

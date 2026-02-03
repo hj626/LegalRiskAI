@@ -1,2 +1,4 @@
-# boonAI/app/__init__.py
-# FastAPI 앱 패키지
+# Ai_boon/app/__init__.py
+"""
+분쟁 유형 분류 AI 모듈
+"""

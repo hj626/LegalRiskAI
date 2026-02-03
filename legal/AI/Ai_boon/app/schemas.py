@@ -1,50 +1,41 @@
-# boonAI/app/schemas.py
-# ====================================================================
-# Pydantic 스키마 정의
-# 요청/응답 데이터 모델
-# ====================================================================
-
+# Ai_boon/app/schemas.py
+"""
+분쟁 유형 분류 API 스키마
+"""
+from typing import Optional, List
 from pydantic import BaseModel
-from typing import Dict, List, Optional
 
-# ================================================================
-# 분류 API 스키마
-# ================================================================
 
 class ClassifyRequest(BaseModel):
-    """분류 요청 스키마"""
-    text: str  # 분류할 텍스트
+    """분류 요청"""
+    case_text: str
     
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "case_text": "계약 체결 후 상대방이 이행을 거부하고 있습니다. 계약금 500만원을 지불했으나..."
+            }
+        }
+
+
 class ClassifyResponse(BaseModel):
-    """분류 응답 스키마"""
-    dispute_type: str  # 분류된 분쟁 유형
-    confidence: float  # 예측 신뢰도 (0.0 ~ 1.0)
-    probabilities: Dict[str, float]  # 각 유형별 확률
-    description: Optional[str] = None  # 분쟁 유형 설명
-
-# ================================================================
-# 통합 분석 API 스키마 (05-2 기반)
-# ================================================================
-
-class SimilarCase(BaseModel):
-    """유사 케이스 정보"""
-    content: str  # 케이스 내용
-    score: float  # 유사도 점수
-
-class UnifiedAnalyzeRequest(BaseModel):
-    """통합 분석 요청 스키마"""
-    text: str  # 상담 텍스트
-    top_k: int = 3  # 검색할 유사 케이스 수
-
-class UnifiedAnalyzeResponse(BaseModel):
-    """통합 분석 응답 스키마"""
-    # 1. 분류 결과
-    dispute_type: str
-    confidence: float
-    description: Optional[str] = None
+    """분류 응답 - 분쟁 템플릿 형식"""
+    success: bool
     
-    # 2. 유사 케이스 (RAG)
-    similar_cases: List[SimilarCase]
+    # 기본 분류 정보
+    대분류: str                    # 민사/형사/행정
+    세부분류: str                  # 민사 (손해배상) 등
+    당사자: str                    # 피해자 vs 가해자
+    분쟁내용: str                  # 손해배상 청구
+    법적성격: str                  # 불법행위
     
-    # 3. LLM 생성 답변
-    answer: str
+    # 추가 정보
+    분류이유: Optional[str] = None  # 분류 근거 설명
+    키워드: Optional[List[str]] = None  # 관련 키워드
+
+
+class HealthResponse(BaseModel):
+    """헬스체크 응답"""
+    status: str
+    model_loaded: bool
+    vectorizer_loaded: bool

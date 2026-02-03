@@ -1,58 +1,34 @@
-# =================================================================
-# BoonAI 통합 법률 AI 서비스 Docker Compose
-# FastAPI + Ollama LLM
-# =================================================================
+# Ai_boon Docker Compose
+# 분쟁 유형 분류 AI 서버 단독 실행
 
 version: '3.8'
 
 services:
-  # ============================================
-  # Ollama LLM 서버
-  # ============================================
-  ollama:
-    image: ollama/ollama:latest
-    container_name: boonai-ollama
+  ai-boonjang:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: legal-ai-boonjang
     ports:
-      - "11434:11434"
+      - "8001:8001"
     volumes:
-      - ollama_data:/root/.ollama
-    # GPU 사용 시 아래 주석 해제
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: 1
-    #           capabilities: [gpu]
+
+      - ./saved_models:/app/saved_models:ro
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8001
+      - PYTHONUNBUFFERED=1
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:11434/api/tags" ]
+      test: [ "CMD", "curl", "-f", "http://localhost:8001/health" ]
       interval: 30s
       timeout: 10s
-      retries: 5
+      retries: 3
+      start_period: 10s
 
-  # ============================================
-  # BoonAI FastAPI 서버
-  # ============================================
-  boonai-api:
-    build: .
-    container_name: boonai-api
-    ports:
-      - "8000:8000"
-    volumes:
-      # 학습된 모델 마운트
-      - ./final:/workspace/models:ro
-      # 벡터 스토어 마운트
-      - ./vector_store:/workspace/vector_store:ro
-    environment:
-      - MODEL_PATH=/workspace/models
-      - VECTOR_STORE_PATH=/workspace/vector_store
-      - OLLAMA_HOST=http://ollama:11434
-      - OLLAMA_MODEL=qwen2.5:7b
-    depends_on:
-      ollama:
-        condition: service_healthy
-    restart: unless-stopped
-
-volumes:
-  ollama_data:
+# 네트워크 (자동 생성)
+# 다른 AI 서비스와 연결하려면 아래 주석 해제
+# networks:
+#   default:
+#     name: legal-ai-network
+#     external: true

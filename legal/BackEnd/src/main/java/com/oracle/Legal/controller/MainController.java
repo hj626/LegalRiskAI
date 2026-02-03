@@ -1,4 +1,5 @@
 package com.oracle.Legal.controller;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -8,6 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import com.oracle.Legal.dto.AccountDto;
 import com.oracle.Legal.dto.ClientDto;
 import com.oracle.Legal.service.ClientService;
+import com.oracle.Legal.service.AdminDashboardService;   
+import com.oracle.Legal.dto.DashboardDto;               
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -15,41 +18,45 @@ import lombok.RequiredArgsConstructor;
 @Controller
 @RequiredArgsConstructor
 public class MainController {
-	
-	    private final ClientService clientService;
 
-	
-	 // 세션 확인용
-	    @GetMapping("/")
-	    public String mainPage(Model model, HttpSession session) {
+    private final ClientService clientService;
+    private final AdminDashboardService adminDashboardService;
 
-	        Integer clientCode = (Integer) session.getAttribute("client_code");
+    @GetMapping("/")
+    public String mainPage(Model model, HttpSession session) {
 
-	        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Integer clientCode = (Integer) session.getAttribute("client_code");
 
-	        if (auth != null && auth.isAuthenticated()
-	                && auth.getPrincipal() instanceof AccountDto) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-	            AccountDto account = (AccountDto) auth.getPrincipal();
+        if (auth != null && auth.isAuthenticated()
+                && auth.getPrincipal() instanceof AccountDto) {
 
-	            // client_code = null일때
-	            if (clientCode == null) {
-	                clientCode = account.getClient_code();   
-	                if (clientCode != null) {
-	                    session.setAttribute("client_code", clientCode);
-	                }
-	            }
+            AccountDto account = (AccountDto) auth.getPrincipal();
 
-	            // 비정상 로그인 상태 
-	            if (clientCode != null) {
-	                ClientDto user = clientService.getSingleClient(clientCode);
-	                model.addAttribute("user", user);
-	            }
-	        }
+            // client_code = null일때 세션에 채우기
+            if (clientCode == null) {
+                clientCode = account.getClient_code();
+                if (clientCode != null) {
+                    session.setAttribute("client_code", clientCode);
+                }
+            }
 
-	        return "main";
-	    }
+            // 유저 정보
+            if (clientCode != null) {
+                ClientDto user = clientService.getSingleClient(clientCode);
+                model.addAttribute("user", user);
+            }
 
+            boolean isAdmin = auth.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
 
-	
+            if (isAdmin) {
+                DashboardDto dashboard = adminDashboardService.getDashboard();
+                model.addAttribute("dashboard", dashboard);
+            }
+        }
+
+        return "main";
+    }
 }

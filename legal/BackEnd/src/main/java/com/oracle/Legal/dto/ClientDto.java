@@ -1,5 +1,7 @@
 package com.oracle.Legal.dto;
 
+import java.time.LocalDateTime;
+
 import com.oracle.Legal.domain.Client;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,6 +18,7 @@ public class ClientDto {
 	private String    client_tel;				//전화번호
 	private String client_job;				//직업
 	private int    client_is_del;		//삭제여부
+	private LocalDateTime	client_reg_date;	//가입일
 	
 	// account
     private String username;
@@ -28,6 +31,7 @@ public class ClientDto {
 		this.client_tel = client.getClient_tel();
 		this.client_job = client.getClient_job();
 		this.client_is_del = client.getClient_is_del();
+		this.client_reg_date = client.getClient_reg_date();
 		
 	
 	}

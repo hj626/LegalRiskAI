@@ -44,6 +44,7 @@ public class ClientRepositoryImpl implements ClientRepository {
 		        dto.setClient_tel(c.getClient_tel());
 		        dto.setClient_job(c.getClient_job());
 		        dto.setClient_is_del(c.getClient_is_del());  
+		        dto.setClient_reg_date(c.getClient_reg_date());
 
 		        
 		        return dto;
@@ -108,6 +109,7 @@ public class ClientRepositoryImpl implements ClientRepository {
 	        dto.setClient_tel(c.getClient_tel());
 	        dto.setClient_job(c.getClient_job());
 	        dto.setClient_is_del(c.getClient_is_del()); 
+	        dto.setClient_reg_date(c.getClient_reg_date());
 	        return dto;
 	    }).collect(Collectors.toList());
 	}

@@ -3,6 +3,9 @@
 <%@ page import="org.springframework.security.core.Authentication" %>
 <%@ page import="com.oracle.Legal.dto.AccountDto" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+
 
 <!DOCTYPE html>
 <html>
@@ -84,6 +87,17 @@
         <div class="kv">
           <div class="k">회원 코드</div>
           <div class="v"><%= clientCode %></div>
+        </div>
+
+        <!-- ✅ 가입일 추가 -->
+        <div class="kv">
+          <div class="k">가입일</div>
+			<div class="v">
+			  <c:choose>
+			    <c:when test="${empty user.client_reg_date}">-</c:when>
+			    <c:otherwise>${fn:substring(user.client_reg_date, 0, 10)}</c:otherwise>
+			  </c:choose>
+			</div>
         </div>
 
         <div class="d-grid gap-2 mt-4">

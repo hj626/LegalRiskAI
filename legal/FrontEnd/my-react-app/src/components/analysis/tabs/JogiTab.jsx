@@ -6,18 +6,53 @@ import axios from "axios";
  * - 자체 분석 버튼 보유
  * - /analyze API 호출 후 summary 사용
  * - AI 요약 및 해결책 표시
- * 
- * Props:
- *   - inputText: 분석할 텍스트 (부모에서 전달)
+ * - 저장 기능 추가
  */
 
 const API_BASE = "http://localhost:8000";
+const BACKEND_API = "http://localhost:8484";
 
 export default function SolutionTab({ inputText }) {
     const [result, setResult] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [copied, setCopied] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [saveSuccess, setSaveSuccess] = useState(false);
+
+    // 저장 함수
+    const handleSave = async () => {
+        if (!result) {
+            setError("저장할 분석 결과가 없습니다.");
+            return;
+        }
+
+        setSaving(true);
+        setSaveSuccess(false);
+
+        try {
+            const outputText = `[해결 전략 분석 결과]
+[위험 수준] ${result.overallRisk || "미정"}
+[분쟁 유형] ${result.classification?.inferred_type || "미분류"}
+[AI 요약] ${result.summary || ""}${result.feedback ? `
+[AI 해결 제안] ${result.feedback}` : ""}`;
+
+            await axios.post(`${BACKEND_API}/api/jogi/save`, {
+                jogi_input: inputText,
+                jogi_output: outputText,
+                jogi_winrate: 0,
+                jogi_mark: 0
+            });
+
+            setSaveSuccess(true);
+            setTimeout(() => setSaveSuccess(false), 3000);
+        } catch (err) {
+            console.error("[해결전략 탭] 저장 오류:", err);
+            setError("저장 중 오류가 발생했습니다.");
+        } finally {
+            setSaving(false);
+        }
+    };
 
     const handleAnalyze = async () => {
         if (!inputText || !inputText.trim()) {
@@ -131,15 +166,7 @@ export default function SolutionTab({ inputText }) {
 
                 <button
                     onClick={handleAnalyze}
-                    className="
-            px-8 py-4 
-            bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 
-            text-white text-base font-semibold rounded-xl 
-            transition-all duration-300 
-            hover:shadow-[0_8px_30px_rgba(16,185,129,0.4)] 
-            hover:scale-105
-            active:scale-95
-          "
+                    className="px-8 py-4 bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 text-white text-base font-semibold rounded-xl transition-all duration-300 hover:shadow-[0_8px_30px_rgba(16,185,129,0.4)] hover:scale-105 active:scale-95"
                 >
                     💡 해결 전략 분석하기
                 </button>
@@ -156,6 +183,13 @@ export default function SolutionTab({ inputText }) {
                 <h3 className="text-lg font-semibold text-slate-800">💡 해결 전략 분석 결과</h3>
                 <div className="flex gap-2">
                     <button
+                        onClick={handleSave}
+                        disabled={saving}
+                        className="px-4 py-2 text-sm bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition disabled:opacity-50"
+                    >
+                        {saving ? "저장 중..." : saveSuccess ? "✅ 저장됨" : "💾 저장"}
+                    </button>
+                    <button
                         onClick={handleCopy}
                         className="px-4 py-2 text-sm bg-slate-50 text-slate-600 rounded-lg hover:bg-slate-100 transition"
                     >
@@ -169,6 +203,13 @@ export default function SolutionTab({ inputText }) {
                     </button>
                 </div>
             </div>
+
+            {/* 저장 성공 메시지 */}
+            {saveSuccess && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-green-700 text-sm">
+                    ✅ 분석 결과가 저장되었습니다.
+                </div>
+            )}
 
             {/* 위험 수준 */}
             <div className={`rounded-xl p-5 border ${riskStyle.bg} ${riskStyle.border}`}>

@@ -6,17 +6,52 @@ import axios from "axios";
  * - 자체 분석 버튼 보유
  * - /risk-analyze API 호출
  * - 승소율, 위험도, 형량, 벌금 표시
- * 
- * Props:
- *   - inputText: 분석할 텍스트 (부모에서 전달)
+ * - 저장 기능 추가
  */
 
 const API_BASE = "http://localhost:8000";
+const BACKEND_API = "http://localhost:8484";
 
 export default function RiskTab({ inputText }) {
     const [result, setResult] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [saving, setSaving] = useState(false);
+    const [saveSuccess, setSaveSuccess] = useState(false);
+
+    // 저장 함수
+    const handleSave = async () => {
+        if (!result) {
+            setError("저장할 분석 결과가 없습니다.");
+            return;
+        }
+
+        setSaving(true);
+        setSaveSuccess(false);
+
+        try {
+            const outputText = `[법적 리스크 분석 결과]
+[승소율] ${(result.win_rate || 0).toFixed(1)}%
+[위험도] ${(result.risk || 0).toFixed(0)}/100${result.sentence > 0.1 ? `
+[예상 형량] ${(result.sentence || 0).toFixed(1)}년` : ""}${result.fine > 10000 ? `
+[예상 벌금] ${(result.fine || 0).toLocaleString()}원` : ""}${result.feedback ? `
+[AI 피드백] ${result.feedback}` : ""}`;
+
+            await axios.post(`${BACKEND_API}/api/law/save`, {
+                law_input: inputText,
+                law_output: outputText,
+                law_mark: 0
+            });
+
+            setSaveSuccess(true);
+            setTimeout(() => setSaveSuccess(false), 3000);
+        } catch (err) {
+            console.error("[리스크 탭] 저장 오류:", err);
+            setError("저장 중 오류가 발생했습니다.");
+        } finally {
+            setSaving(false);
+        }
+    };
 
     const handleAnalyze = async () => {
         if (!inputText || !inputText.trim()) {
@@ -109,15 +144,7 @@ export default function RiskTab({ inputText }) {
 
                 <button
                     onClick={handleAnalyze}
-                    className="
-            px-8 py-4 
-            bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 
-            text-white text-base font-semibold rounded-xl 
-            transition-all duration-300 
-            hover:shadow-[0_8px_30px_rgba(245,158,11,0.4)] 
-            hover:scale-105
-            active:scale-95
-          "
+                    className="px-8 py-4 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white text-base font-semibold rounded-xl transition-all duration-300 hover:shadow-[0_8px_30px_rgba(245,158,11,0.4)] hover:scale-105 active:scale-95"
                 >
                     ⚠️ 리스크 분석하기
                 </button>
@@ -146,13 +173,29 @@ export default function RiskTab({ inputText }) {
         <div className="space-y-6 p-6">
             <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-slate-800">⚠️ 법적 리스크 분석 결과</h3>
-                <button
-                    onClick={handleAnalyze}
-                    className="px-4 py-2 text-sm bg-amber-50 text-amber-600 rounded-lg hover:bg-amber-100 transition"
-                >
-                    🔄 다시 분석
-                </button>
+                <div className="flex gap-2">
+                    <button
+                        onClick={handleSave}
+                        disabled={saving}
+                        className="px-4 py-2 text-sm bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition disabled:opacity-50"
+                    >
+                        {saving ? "저장 중..." : saveSuccess ? "✅ 저장됨" : "💾 저장"}
+                    </button>
+                    <button
+                        onClick={handleAnalyze}
+                        className="px-4 py-2 text-sm bg-amber-50 text-amber-600 rounded-lg hover:bg-amber-100 transition"
+                    >
+                        🔄 다시 분석
+                    </button>
+                </div>
             </div>
+
+            {/* 저장 성공 메시지 */}
+            {saveSuccess && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-green-700 text-sm">
+                    ✅ 분석 결과가 저장되었습니다.
+                </div>
+            )}
 
             {/* 승소율 */}
             <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100">
@@ -166,7 +209,7 @@ export default function RiskTab({ inputText }) {
                 <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
                     <div
                         className={`h-full rounded-full transition-all ${(win_rate || 0) >= 70 ? "bg-green-500" :
-                                (win_rate || 0) >= 40 ? "bg-amber-500" : "bg-red-500"
+                            (win_rate || 0) >= 40 ? "bg-amber-500" : "bg-red-500"
                             }`}
                         style={{ width: `${win_rate || 0}%` }}
                     />

@@ -6,7 +6,7 @@ Rule-based 방식으로 텍스트에서 사건 유형을 추정
 import re
 from typing import Tuple
 
-def infer_case_type(text: str) -> Tuple[str, float]:
+def infer_case_type(text: str) -> str:
     """
     텍스트에서 사건 유형을 자동으로 추정
     
@@ -14,10 +14,10 @@ def infer_case_type(text: str) -> Tuple[str, float]:
         text: 사용자가 입력한 사연
         
     Returns:
-        (case_type, confidence): 추정된 유형과 신뢰도 (0.0~1.0)
+        case_type: 추정된 유형 (형사/가사/노동/전체)
     """
     if not text or not text.strip():
-        return "전체", 0.0
+        return "전체"
     
     text = text.lower()
     
@@ -65,22 +65,18 @@ def infer_case_type(text: str) -> Tuple[str, float]:
     max_score = max(criminal_score, family_score, labor_score)
     
     if max_score == 0:
-        return "전체", 0.3  # 애매한 경우
+        return "전체"
     
     if criminal_score == max_score and criminal_score >= 2:
-        confidence = min(0.9, 0.6 + criminal_score * 0.1)
-        return "형사", confidence
+        return "형사"
     
     if family_score == max_score and family_score >= 2:
-        confidence = min(0.9, 0.6 + family_score * 0.1)
-        return "가사", confidence
+        return "가사"
     
     if labor_score == max_score and labor_score >= 2:
-        confidence = min(0.9, 0.6 + labor_score * 0.1)
-        return "노동", confidence
+        return "노동"
     
-    # 점수가 낮으면 전체 검색
-    return "전체", 0.4
+    return "전체"
 
 
 def get_case_type_label(case_type: str) -> str:
@@ -94,20 +90,12 @@ def get_case_type_label(case_type: str) -> str:
     return labels.get(case_type, "일반 사건")
 
 
-def get_case_type_description(case_type: str, confidence: float) -> str:
+def get_case_type_description(case_type: str) -> str:
     """사용자에게 보여줄 설명"""
-    if confidence >= 0.8:
-        reliability = "높은 확신으로"
-    elif confidence >= 0.6:
-        reliability = "상당한 확신으로"
-    else:
-        reliability = "추정상"
-    
     descriptions = {
-        "형사": f"{reliability} 형사 사건으로 판단하여 형사 판례를 검색합니다.",
-        "가사": f"{reliability} 가사 사건으로 판단하여 가사 판례를 검색합니다.",
-        "노동": f"{reliability} 노동 분쟁으로 판단하여 노동 관련 판례를 검색합니다.",
-        "전체": "구체적인 사건 유형이 명확하지 않아 전체 판례를 검색합니다."
+        "형사": "형사 사건으로 판단하여 형사 판례 기준으로 분석합니다.",
+        "가사": "가사 사건으로 판단하여 가사 판례 기준으로 분석합니다.",
+        "노동": "노동 분쟁으로 판단하여 노동 관련 판례 기준으로 분석합니다.",
+        "전체": "구체적인 사건 유형이 명확하지 않아 종합적으로 분석합니다."
     }
-    
-    return descriptions.get(case_type, "판례를 검색합니다.")
+    return descriptions.get(case_type, "판례를 분석합니다.")

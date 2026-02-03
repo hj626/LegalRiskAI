@@ -2,18 +2,20 @@ import React, { useState } from "react";
 import axios from "axios";
 
 /**
- * 분쟁유형 탭 컴포넌트
- * - 자체 분석 버튼 보유
- * - /classify 또는 /analyze API 호출
- * - 결과를 자체적으로 저장하고 표시
+ * 분쟁유형 탭 컴포넌트 (BoonjangTab)
+ * 
+ * - Ai_boon FastAPI 서버와 연동 (포트 8001)
+ * - /classify API 호출하여 분쟁 유형 분류
+ * - 결과: 대분류, 세부분류, 당사자, 분쟁내용, 법적성격
  * 
  * Props:
  *   - inputText: 분석할 텍스트 (부모에서 전달)
  */
 
-const API_BASE = "http://localhost:8000";
+// Ai_boon 서버 주소 (분쟁 유형 분류 전용)
+const BOONJANG_API = "http://localhost:8001";
 
-export default function DisputeTab({ inputText }) {
+export default function BoonjangTab({ inputText }) {
     // 이 탭만의 상태
     const [result, setResult] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -27,8 +29,8 @@ export default function DisputeTab({ inputText }) {
             return;
         }
 
-        if (inputText.trim().length < 50) {
-            setError("최소 50자 이상 입력해주세요.");
+        if (inputText.trim().length < 10) {
+            setError("최소 10자 이상 입력해주세요.");
             return;
         }
 
@@ -37,19 +39,31 @@ export default function DisputeTab({ inputText }) {
 
         try {
             console.log("[분쟁유형 탭] 분석 시작...");
+            console.log("[분쟁유형 탭] API:", `${BOONJANG_API}/classify`);
 
-            // /analyze API 호출 (classification 정보 포함)
-            const response = await axios.post(`${API_BASE}/analyze`, {
+            // Ai_boon /classify API 호출
+            const response = await axios.post(`${BOONJANG_API}/classify`, {
                 case_text: inputText
             });
 
-            // classification 부분만 저장
-            setResult(response.data.classification);
-            console.log("[분쟁유형 탭] 분석 완료:", response.data.classification);
+            console.log("[분쟁유형 탭] 응답:", response.data);
+
+            // 응답 저장
+            setResult(response.data);
+            console.log("[분쟁유형 탭] 분석 완료!");
 
         } catch (err) {
             console.error("[분쟁유형 탭] 분석 오류:", err);
-            setError(err.response?.data?.detail || "분석 중 오류가 발생했습니다.");
+
+            // 에러 메시지 처리
+            let errorMsg = "분석 중 오류가 발생했습니다.";
+            if (err.code === "ERR_NETWORK") {
+                errorMsg = "분쟁 분류 서버에 연결할 수 없습니다. (포트 8001)";
+            } else if (err.response?.data?.detail) {
+                errorMsg = err.response.data.detail;
+            }
+
+            setError(errorMsg);
         } finally {
             setLoading(false);
         }
@@ -105,24 +119,26 @@ export default function DisputeTab({ inputText }) {
                 <button
                     onClick={handleAnalyze}
                     className="
-            px-8 py-4 
-            bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 
-            text-white text-base font-semibold rounded-xl 
-            transition-all duration-300 
-            hover:shadow-[0_8px_30px_rgba(59,130,246,0.4)] 
-            hover:scale-105
-            active:scale-95
-          "
+                        px-8 py-4 
+                        bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 
+                        text-white text-base font-semibold rounded-xl 
+                        transition-all duration-300 
+                        hover:shadow-[0_8px_30px_rgba(59,130,246,0.4)] 
+                        hover:scale-105
+                        active:scale-95
+                    "
                 >
                     ⚖️ 분쟁 유형 분석하기
                 </button>
+
+                <p className="text-xs text-slate-400 mt-4">
+                    Ai_boon 서버 (포트 8001)
+                </p>
             </div>
         );
     }
 
-    // 4) 결과 표시
-    const { inferred_type, confidence, label, llm_analysis } = result;
-
+    // 4) 결과 표시 - 테이블 형식
     return (
         <div className="space-y-6 p-6">
             <div className="flex items-center justify-between">
@@ -135,76 +151,67 @@ export default function DisputeTab({ inputText }) {
                 </button>
             </div>
 
-            {/* BERT 분류 결과 */}
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
-                <h4 className="text-base font-semibold text-slate-800 mb-4">🤖 AI 자동 분류 (BERT)</h4>
-                <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm text-slate-600">분류:</span>
-                    <span className="text-base font-semibold text-blue-600">{inferred_type || "-"}</span>
-                </div>
-                <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm text-slate-600">레이블:</span>
-                    <span className="text-base text-slate-800">{label || "-"}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-600">신뢰도:</span>
-                    <div className="flex items-center gap-2">
-                        <div className="w-32 h-2 bg-blue-100 rounded-full overflow-hidden">
-                            <div
-                                className="h-full bg-blue-500 rounded-full transition-all"
-                                style={{ width: `${(confidence || 0) * 100}%` }}
-                            />
-                        </div>
-                        <span className="text-base text-slate-800">{((confidence || 0) * 100).toFixed(1)}%</span>
-                    </div>
-                </div>
+            {/* 분류 결과 테이블 */}
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl overflow-hidden border border-blue-100">
+                <table className="w-full">
+                    <tbody>
+                        <tr className="border-b border-blue-100">
+                            <td className="px-4 py-3 bg-blue-100/50 font-semibold text-blue-800 w-28">대분류</td>
+                            <td className="px-4 py-3">
+                                <span className={`inline-block px-3 py-1 rounded-full font-semibold text-sm ${result.대분류 === "민사"
+                                    ? "bg-blue-100 text-blue-700"
+                                    : result.대분류 === "형사"
+                                        ? "bg-red-100 text-red-700"
+                                        : "bg-green-100 text-green-700"
+                                    }`}>
+                                    {result.대분류}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr className="border-b border-blue-100">
+                            <td className="px-4 py-3 bg-blue-100/50 font-semibold text-blue-800">세부분류</td>
+                            <td className="px-4 py-3 text-slate-800">{result.세부분류}</td>
+                        </tr>
+                        <tr className="border-b border-blue-100">
+                            <td className="px-4 py-3 bg-blue-100/50 font-semibold text-blue-800">당사자</td>
+                            <td className="px-4 py-3 text-slate-800">{result.당사자}</td>
+                        </tr>
+                        <tr className="border-b border-blue-100">
+                            <td className="px-4 py-3 bg-blue-100/50 font-semibold text-blue-800">분쟁내용</td>
+                            <td className="px-4 py-3 text-slate-800">{result.분쟁내용}</td>
+                        </tr>
+                        <tr>
+                            <td className="px-4 py-3 bg-blue-100/50 font-semibold text-blue-800">법적성격</td>
+                            <td className="px-4 py-3 text-slate-800">{result.법적성격}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
 
-            {/* LLM 상세 분석 (있을 경우) */}
-            {llm_analysis?.available && (
-                <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-100">
-                    <h4 className="text-base font-semibold text-slate-800 mb-4">🧠 LLM 상세 분석 (Qwen)</h4>
+            {/* 분류 이유 */}
+            {result.분류이유 && (
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-5 border border-green-100">
+                    <h4 className="text-sm font-semibold text-green-800 mb-2">💡 분류 근거</h4>
+                    <p className="text-sm text-green-700 leading-relaxed">
+                        {result.분류이유}
+                    </p>
+                </div>
+            )}
 
-                    <div className="flex justify-between items-center mb-4">
-                        <span className="text-sm text-slate-600">카테고리:</span>
-                        <span className="text-base text-slate-800">{llm_analysis.category || "-"}</span>
+            {/* 관련 키워드 */}
+            {result.키워드 && result.키워드.length > 0 && (
+                <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-5 border border-purple-100">
+                    <h4 className="text-sm font-semibold text-purple-800 mb-3">🏷️ 관련 키워드</h4>
+                    <div className="flex flex-wrap gap-2">
+                        {result.키워드.map((keyword, i) => (
+                            <span
+                                key={i}
+                                className="px-3 py-1 bg-purple-100 text-purple-700 text-sm rounded-full"
+                            >
+                                {keyword}
+                            </span>
+                        ))}
                     </div>
-
-                    {llm_analysis.reasoning && (
-                        <div className="mb-4">
-                            <span className="text-sm font-medium text-slate-700 block mb-2">분석 근거:</span>
-                            <p className="text-sm text-slate-600 leading-relaxed bg-white/50 p-3 rounded-lg">
-                                {llm_analysis.reasoning}
-                            </p>
-                        </div>
-                    )}
-
-                    {llm_analysis.key_points?.length > 0 && (
-                        <div>
-                            <span className="text-sm font-medium text-slate-700 block mb-2">핵심 쟁점:</span>
-                            <ul className="space-y-1.5">
-                                {llm_analysis.key_points.map((point, i) => (
-                                    <li key={i} className="text-sm text-slate-600 flex items-start gap-2">
-                                        <span className="text-purple-500 mt-0.5">•</span>
-                                        <span>{point}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    )}
-
-                    {llm_analysis.related_laws?.length > 0 && (
-                        <div className="mt-4 pt-4 border-t border-purple-200">
-                            <span className="text-sm font-medium text-slate-700 block mb-2">관련 법령:</span>
-                            <div className="flex flex-wrap gap-2">
-                                {llm_analysis.related_laws.map((law, i) => (
-                                    <span key={i} className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">
-                                        {law}
-                                    </span>
-                                ))}
-                            </div>
-                        </div>
-                    )}
                 </div>
             )}
         </div>

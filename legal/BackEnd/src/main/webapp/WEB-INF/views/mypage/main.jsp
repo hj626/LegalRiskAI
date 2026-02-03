@@ -166,7 +166,7 @@
         <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
           <div class="d-flex gap-2 align-items-center">
             <select class="form-select form-select-sm" style="width: 180px;"
-              onchange="location.href='${pageContext.request.contextPath}/mypage/main?serviceType=' + this.value + '&page=1';">
+			onchange="location.href='${pageContext.request.contextPath}/mypage/main?serviceType=' + this.value + '&page=1&size=${size}';">
               <option value="">전체</option>
               <option value="JOGI" ${param.serviceType == 'JOGI' ? 'selected' : ''}>조기위험</option>
               <option value="LAW" ${param.serviceType == 'LAW' ? 'selected' : ''}>법적위험</option>
@@ -183,7 +183,8 @@
 
         <form id="bulkForm" method="post" action="${pageContext.request.contextPath}/mypage/history/delete">
           <input type="hidden" name="page" value="${page}">
-          <input type="hidden" name="serviceTypeFilter" value="${param.serviceType}">
+		  <input type="hidden" name="serviceType" value="${param.serviceType}">
+
 
           <div class="table-responsive">
             <table class="table align-middle mb-0">
@@ -307,19 +308,19 @@
           <ul class="pagination pagination-sm mb-0">
             <li class="page-item ${page <= 1 ? 'disabled' : ''}">
               <a class="page-link"
-                 href="${pageContext.request.contextPath}/mypage?page=${page-1}&serviceType=${param.serviceType}">‹</a>
+                 href="${pageContext.request.contextPath}/mypage/main?page=${page-1}&size=${size}&serviceType=${param.serviceType}">‹</a>
             </li>
 
             <c:forEach var="p" begin="1" end="${totalPages}">
               <li class="page-item ${p == page ? 'active' : ''}">
                 <a class="page-link"
-                   href="${pageContext.request.contextPath}/mypage?page=${p}&serviceType=${param.serviceType}">${p}</a>
+		href="${pageContext.request.contextPath}/mypage/main?page=${p}&size=${size}&serviceType=${param.serviceType}">${p}</a>
               </li>
             </c:forEach>
 
             <li class="page-item ${page >= totalPages ? 'disabled' : ''}">
               <a class="page-link"
-                 href="${pageContext.request.contextPath}/mypage?page=${page+1}&serviceType=${param.serviceType}">›</a>
+		href="${pageContext.request.contextPath}/mypage/main?page=${page+1}&size=${size}&serviceType=${param.serviceType}">›</a>
             </li>
           </ul>
         </div>

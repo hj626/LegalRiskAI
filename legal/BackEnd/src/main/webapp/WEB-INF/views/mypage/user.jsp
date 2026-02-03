@@ -158,12 +158,27 @@
               <input type="text" class="form-control" name="client_tel"
                      value="${user.client_tel}">
             </div>
+						
+			<div class="col-12">
+			  <label class="form-label">직업</label>
+			
+			  <select class="form-select" name="client_job">
+			
+			    <option value="">선택하세요</option>
+			
+			    <option value="학생" ${user.client_job == '학생' ? 'selected' : ''}>학생</option>
+			    <option value="회사원" ${user.client_job == '회사원' ? 'selected' : ''}>회사원</option>
+			    <option value="공무원" ${user.client_job == '공무원' ? 'selected' : ''}>공무원</option>
+			    <option value="자영업자" ${user.client_job == '자영업자' ? 'selected' : ''}>자영업자</option>
+			    <option value="프리랜서" ${user.client_job == '프리랜서' ? 'selected' : ''}>프리랜서</option>
+			    <option value="전문직" ${user.client_job == '전문직' ? 'selected' : ''}>전문직</option>
+			    <option value="군인" ${user.client_job == '군인' ? 'selected' : ''}>군인</option>
+			    <option value="무직" ${user.client_job == '무직' ? 'selected' : ''}>무직</option>
+			    <option value="기타" ${user.client_job == '기타' ? 'selected' : ''}>기타</option>
+			
+			  </select>
+			</div>
 
-            <div class="col-12">
-              <label class="form-label">직업</label>
-              <input type="text" class="form-control" name="client_job"
-                     value="${user.client_job}">
-            </div>
 
             <div class="col-12 text-end">
               <button type="submit" class="btn btn-primary">저장</button>

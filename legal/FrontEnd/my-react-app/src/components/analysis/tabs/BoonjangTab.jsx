@@ -15,11 +15,68 @@ import axios from "axios";
 // Ai_boon 서버 주소 (분쟁 유형 분류 전용)
 const BOONJANG_API = "http://localhost:8001";
 
+// Spring Boot 백엔드 서버 주소 (결과 저장용)
+const BACKEND_API = "http://localhost:8484";
+
 export default function BoonjangTab({ inputText }) {
     // 이 탭만의 상태
     const [result, setResult] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [saving, setSaving] = useState(false);
+    const [saveSuccess, setSaveSuccess] = useState(false);
+
+    // 백엔드 저장 함수
+    const handleSave = async () => {
+        if (!result) {
+            setError("저장할 분석 결과가 없습니다.");
+            return;
+        }
+
+        setSaving(true);
+        setSaveSuccess(false);
+
+        try {
+            console.log("[분쟁유형 탭] 백엔드 저장 시작...");
+
+            // Spring Boot 백엔드로 저장 요청 (BoonjangDto 형식)
+            const saveData = {
+                boonjang_input: inputText,
+                boonjang_output: JSON.stringify({
+                    대분류: result.대분류,
+                    세부분류: result.세부분류,
+                    당사자: result.당사자,
+                    분쟁내용: result.분쟁내용,
+                    법적성격: result.법적성격,
+                    분류이유: result.분류이유 || "",
+                    키워드: result.키워드 || []
+                }),
+                boonjang_mark: 0
+            };
+
+            await axios.post(`${BACKEND_API}/api/boonjang/save`, saveData);
+
+            console.log("[분쟁유형 탭] 저장 완료!");
+            setSaveSuccess(true);
+
+            // 3초 후 성공 메시지 숨김
+            setTimeout(() => setSaveSuccess(false), 3000);
+
+        } catch (err) {
+            console.error("[분쟁유형 탭] 저장 오류:", err);
+
+            let errorMsg = "저장 중 오류가 발생했습니다.";
+            if (err.code === "ERR_NETWORK") {
+                errorMsg = "백엔드 서버에 연결할 수 없습니다. (포트 8484)";
+            } else if (err.response?.data?.message) {
+                errorMsg = err.response.data.message;
+            }
+
+            setError(errorMsg);
+        } finally {
+            setSaving(false);
+        }
+    };
 
     // 분석 실행 함수
     const handleAnalyze = async () => {
@@ -143,12 +200,39 @@ export default function BoonjangTab({ inputText }) {
         <div className="space-y-6 p-6">
             <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-slate-800">📋 분쟁 유형 분석 결과</h3>
-                <button
-                    onClick={handleAnalyze}
-                    className="px-4 py-2 text-sm bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition"
-                >
-                    🔄 다시 분석
-                </button>
+                <div className="flex items-center gap-2">
+                    {/* 저장 성공 메시지 */}
+                    {saveSuccess && (
+                        <span className="text-sm text-green-600 font-medium">
+                            ✅ 저장 완료!
+                        </span>
+                    )}
+                    {/* 백엔드 저장 버튼 */}
+                    <button
+                        onClick={handleSave}
+                        disabled={saving}
+                        className={`px-4 py-2 text-sm rounded-lg transition flex items-center gap-1
+                            ${saving
+                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                : 'bg-green-50 text-green-600 hover:bg-green-100'
+                            }`}
+                    >
+                        {saving ? (
+                            <>
+                                <span className="animate-spin">⏳</span> 저장 중...
+                            </>
+                        ) : (
+                            <>💾 저장하기</>
+                        )}
+                    </button>
+                    {/* 다시 분석 버튼 */}
+                    <button
+                        onClick={handleAnalyze}
+                        className="px-4 py-2 text-sm bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition"
+                    >
+                        🔄 다시 분석
+                    </button>
+                </div>
             </div>
 
             {/* 분류 결과 테이블 */}

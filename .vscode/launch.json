@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-LegalApplication<BackEnd>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.oracle.Legal.LegalApplication",
+            "projectName": "BackEnd",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

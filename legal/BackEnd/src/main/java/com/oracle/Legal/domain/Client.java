@@ -1,8 +1,13 @@
 package com.oracle.Legal.domain;
 
+import java.time.LocalDateTime;
+
 import org.hibernate.annotations.ColumnDefault;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -21,6 +26,7 @@ import lombok.Data;
 		allocationSize = 1					//시퀀스 단위(보통 1)
 		)
 
+@EntityListeners(AuditingEntityListener.class)
 public class Client {
 	@Id
 	@GeneratedValue(
@@ -34,7 +40,9 @@ public class Client {
 	private String	client_tel;				//전화번호
 	private String 	client_job;				//직업
 	@ColumnDefault("0")		//default column을 1로 두겠다: 0-> 탈퇴, 1-> 회원
-	private int 	client_is_del;			//삭제 여부 
+	private int 	client_is_del;			//삭제 여부
+	@CreatedDate
+	private LocalDateTime client_reg_date;			//등록일
 	
 	//검증용 코드 
 	public void changeClient_code(int client_code) {
@@ -55,6 +63,7 @@ public class Client {
 	public void changeClient_is_del (int client_is_del) {
 		this.client_is_del = client_is_del;
 	}
+	
 
 	
 }

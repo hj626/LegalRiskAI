@@ -1,5 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+
 
 <!DOCTYPE html>
 <html>
@@ -48,6 +51,10 @@
                                         <th>이메일</th>
                                         <th style="width: 160px;">전화</th>
                                         <th style="width: 140px;">직업</th>
+
+                                        <!-- ✅ 가입일 컬럼 추가 -->
+                                        <th style="width: 150px;">가입일</th>
+
                                         <th style="width: 110px;">회원여부</th>
                                         <th style="width: 90px;">회원상세</th>
                                     </tr>
@@ -63,6 +70,14 @@
                                                 <td>${c.client_tel}</td>
                                                 <td>${c.client_job}</td>
 
+												<td>
+												  <c:choose>
+												    <c:when test="${empty c.client_reg_date}">-</c:when>
+												    <c:otherwise>${fn:substring(c.client_reg_date, 0, 10)}</c:otherwise>
+												  </c:choose>
+												</td>
+
+
                                                 <td>
                                                     <c:choose>
                                                         <c:when test="${c.client_is_del == 1}">
@@ -77,7 +92,7 @@
                                                 <td>
 													<a class="btn btn-sm btn-outline-primary"
 													   href="${pageContext.request.contextPath}/admin/client/${c.client_code}?page=${page}&size=${size}">
-													   상세보기 
+													   상세보기
 													</a>
                                                 </td>
                                             </tr>

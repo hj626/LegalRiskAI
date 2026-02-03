@@ -103,11 +103,24 @@
 		       oninput="autoHyphen(this)"
 		       required>
         </div>
+		
+		<div class="form-row">
+		    <label>직업</label>
+		    <select name="client_job" required
+		            style="width:100%; height:40px; padding:0 10px; box-sizing:border-box; font-size:14px;">
+		        <option value="" selected disabled>선택하세요</option>
+		        <option value="학생">학생</option>
+		        <option value="회사원">회사원</option>
+		        <option value="공무원">공무원</option>
+		        <option value="자영업자">자영업자</option>
+		        <option value="프리랜서">프리랜서</option>
+		        <option value="전문직">전문직</option>
+		        <option value="군인">군인</option>
+		        <option value="무직">무직</option>
+		        <option value="기타">기타</option>
+		    </select>
+		</div>
 
-        <div class="form-row">
-            <label>직업</label>
-            <input type="text" name="client_job">
-        </div>
 
         <!-- 로그인 정보 -->
         <div class="form-row">

@@ -1,43 +1,54 @@
 # app/schemas.py
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 
 
 # -----------------------------
 # 요청 모델
 # -----------------------------
 class CaseRequest(BaseModel):
-    case_type: Optional[str] = None  # ✅ Optional로 변경 (UI에서 안 보내도 됨)
-    case_text: str                   # 사건 본문 텍스트 (필수)
+    case_type: Optional[str] = None
+    case_text: str
 
 
 # -----------------------------
 # /analyze 관련 모델
 # -----------------------------
 class SimilarCase(BaseModel):
-    case_id: Optional[str]           # ✅ None 가능 (사건번호 누락 케이스)
+    case_id: Optional[str]
     case_name: str
     court: str
     case_number: str
+    decision_type: str
+    decision_result: str
+    similarity: float
+    case_type_label: str
+    xai_reason: str
 
-    decision_type: str               # 판결 / 결정
-    decision_result: str             # 상고기각 / 파기환송 / 파기자판 / 판단불명
 
-    similarity: float                # 0~1
-    case_type_label: str             # ✅ 추가: 판례의 사건종류명 (민사/형사/가사 등)
-    xai_reason: str                  # 유사도 근거 설명
+class SearchResultTypes(BaseModel):
+    """검색 결과 기반 유형 분포"""
+    distribution: Dict[str, int]      # {"민사": 3, "일반행정": 2}
+    percentages: Dict[str, float]     # {"민사": 0.6, "일반행정": 0.4}
+    is_mixed: bool                    # 복수 유형 여부
+    primary_type: str                 # 주요 유형
+    significant_types: List[str]      # 유의미한 유형들
+    note: str                         # 특별 메시지
 
 
 class CaseResponse(BaseModel):
-    overall_risk_level: str          # 낮음 / 중간 / 높음
-    summary: str                     # LLM 요약
+    overall_risk_level: str
+    summary: str
     similar_cases: List[SimilarCase]
     
-    # ✅ 추가: 자동 분류 정보
-    inferred_case_type: str          # AI가 추정한 유형 (형사/가사/노동/전체)
-    case_type_label: str             # UI 표시용 ("형사 사건", "노동 분쟁" 등)
-    case_type_confidence: float      # 신뢰도 0.0 ~ 1.0
-    case_type_description: str       # 사용자에게 보여줄 설명
+    # 자동 분류 정보
+    inferred_case_type: str
+    case_type_label: str
+    case_type_confidence: float
+    case_type_description: str
+    
+    # ✅ 추가: 검색 기반 유형 분포
+    search_result_types: SearchResultTypes
 
 
 # -----------------------------
@@ -45,7 +56,7 @@ class CaseResponse(BaseModel):
 # -----------------------------
 class CaseSummaryResponse(BaseModel):
     case_id: str
-    summary: str                     # 판시사항 / 주문 중심 요약
+    summary: str
 
 
 # -----------------------------
@@ -54,5 +65,5 @@ class CaseSummaryResponse(BaseModel):
 class CaseFullTextResponse(BaseModel):
     case_id: str
     case_name: str
-    full_text: str                   # 판례 전체 전문
-    summary: Optional[str] = ""      # ✅ 추가: 요약도 함께 반환
+    full_text: str
+    summary: Optional[str] = ""

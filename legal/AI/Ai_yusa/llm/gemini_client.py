@@ -1,4 +1,4 @@
-import os                      # ← 이 줄이 빠져 있었음
+import os
 import google.generativeai as genai
 
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))

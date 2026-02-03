@@ -267,20 +267,21 @@ class DisputeClassifier:
         
         print(f"  ✅ Predicted category: {category_key}")
         
-        # 템플릿에서 정보 가져오기
-        template = self._get_template_info(category_key)
+        # 템플릿에서 정보 가져오기 (원본 텍스트로 키워드 매칭)
+        template = self._get_template_info(category_key, text)
         template["confidence"] = confidence
         
         print(f"🔍 [DEBUG] 최종 템플릿: {template}")
         
         return template
     
-    def _get_template_info(self, category_key: str) -> Dict[str, Any]:
+    def _get_template_info(self, category_key: str, original_text: str = "") -> Dict[str, Any]:
         """
         분류 키에 해당하는 템플릿 정보 반환
         
         Args:
-            category_key: 분류 키 (예: "민사_손해배상")
+            category_key: 분류 키 (예: "민사", "형사", 또는 "민사_손해배상")
+            original_text: 원본 입력 텍스트 (키워드 기반 세부분류에 사용)
             
         Returns:
             템플릿 정보 딕셔너리
@@ -301,7 +302,7 @@ class DisputeClassifier:
             print("  [WARN] Templates not loaded, using default")
             return default_template
         
-        # 정확히 일치하는 템플릿 찾기
+        # 정확히 일치하는 템플릿 찾기 (예: "민사_손해배상")
         if category_key in self.templates:
             template = self.templates[category_key]
             return {
@@ -315,11 +316,36 @@ class DisputeClassifier:
                 "키워드": template.get("키워드", [])
             }
         
-        # 부분 매칭 시도 (예: "민사" -> "민사_기타")
+        # 카테고리 키가 대분류만 있는 경우 (예: "민사", "형사")
+        # 키워드 기반으로 세부분류 찾기
+        print(f"  🔍 [DEBUG] 대분류 '{category_key}'에서 세부분류 탐색 중...")
+        
+        # 해당 대분류에 속하는 템플릿들 수집
+        matching_templates = []
         for key, template in self.templates.items():
-            if category_key in key or key in category_key:
+            if template.get("대분류") == category_key or key.startswith(category_key + "_"):
+                matching_templates.append((key, template))
+        
+        # 키워드 매칭으로 가장 적합한 세부분류 찾기
+        if original_text and matching_templates:
+            best_match = None
+            best_score = 0
+            
+            for key, template in matching_templates:
+                keywords = template.get("키워드", [])
+                score = sum(1 for kw in keywords if kw in original_text)
+                print(f"    템플릿 '{key}': 키워드 매칭 점수 = {score}")
+                
+                if score > best_score:
+                    best_score = score
+                    best_match = (key, template)
+            
+            # 키워드 매칭 결과 반환
+            if best_match and best_score > 0:
+                key, template = best_match
+                print(f"  ✅ [DEBUG] 키워드 매칭 성공: '{key}' (점수: {best_score})")
                 return {
-                    "대분류": template.get("대분류", "기타"),
+                    "대분류": template.get("대분류", category_key),
                     "세부분류": template.get("분류", key),
                     "당사자": template.get("당사자", "원고 vs 피고"),
                     "분쟁내용": template.get("분쟁내용", "분쟁"),
@@ -328,6 +354,22 @@ class DisputeClassifier:
                     "분류이유": template.get("분류이유"),
                     "키워드": template.get("키워드", [])
                 }
+        
+        # 부분 매칭 시도 (예: "민사" -> "민사_기타")
+        fallback_key = f"{category_key}_기타"
+        if fallback_key in self.templates:
+            template = self.templates[fallback_key]
+            print(f"  ⚠️ [DEBUG] 기본 템플릿 사용: '{fallback_key}'")
+            return {
+                "대분류": template.get("대분류", category_key),
+                "세부분류": template.get("분류", fallback_key),
+                "당사자": template.get("당사자", "원고 vs 피고"),
+                "분쟁내용": template.get("분쟁내용", "분쟁"),
+                "법적성격": template.get("법적성격", "기타"),
+                "관련법조": template.get("관련법조"),
+                "분류이유": template.get("분류이유"),
+                "키워드": template.get("키워드", [])
+            }
         
         # 대분류로 기본 템플릿 반환
         if "형사" in category_key:
@@ -341,7 +383,7 @@ class DisputeClassifier:
                 "분류이유": "일반적인 형사 범죄에 관한 사건입니다.",
                 "키워드": []
             }
-        elif "행정" in category_key:
+        elif "행정" in category_key or "일반행정" in category_key:
             return {
                 "대분류": "행정",
                 "세부분류": "행정",
@@ -350,6 +392,50 @@ class DisputeClassifier:
                 "법적성격": "행정소송",
                 "관련법조": "행정소송법 제1조",
                 "분류이유": "행정청의 처분에 대한 취소 또는 무효확인 소송입니다.",
+                "키워드": []
+            }
+        elif "민사" in category_key:
+            return {
+                "대분류": "민사",
+                "세부분류": "민사 (일반)",
+                "당사자": "원고 vs 피고",
+                "분쟁내용": "민사 분쟁",
+                "법적성격": "민사",
+                "관련법조": "민법 일반 조항",
+                "분류이유": "일반적인 민사상 권리·의무 관계에 관한 분쟁입니다.",
+                "키워드": []
+            }
+        elif "가사" in category_key:
+            return {
+                "대분류": "가사",
+                "세부분류": "가사 (일반)",
+                "당사자": "당사자 쌍방",
+                "분쟁내용": "가사 분쟁",
+                "법적성격": "가사",
+                "관련법조": "가사소송법 일반 조항",
+                "분류이유": "가정 내 법률관계에 관한 분쟁입니다.",
+                "키워드": []
+            }
+        elif "세무" in category_key:
+            return {
+                "대분류": "세무",
+                "세부분류": "세무 (일반)",
+                "당사자": "납세자 vs 과세관청",
+                "분쟁내용": "세무 분쟁",
+                "법적성격": "세무",
+                "관련법조": "국세기본법 일반 조항",
+                "분류이유": "세금 부과 및 징수에 관한 분쟁입니다.",
+                "키워드": []
+            }
+        elif "특허" in category_key:
+            return {
+                "대분류": "특허",
+                "세부분류": "특허 (일반)",
+                "당사자": "권리자 vs 침해자",
+                "분쟁내용": "특허 분쟁",
+                "법적성격": "지식재산권",
+                "관련법조": "특허법 일반 조항",
+                "분류이유": "지식재산권에 관한 분쟁입니다.",
                 "키워드": []
             }
         

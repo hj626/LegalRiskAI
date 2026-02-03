@@ -5,7 +5,7 @@ import pickle
 from transformers import AutoTokenizer
 import json
 from typing import Dict, Any
-from model import MultiTaskLegalBERT #내가 만든 모델 불러와
+from llm.model import MultiTaskLegalBERT #내가 만든 모델 불러와
 
 class LegalAnalyzer:
     """법률 사건 분석 클래스 (BERT + Gemini)"""

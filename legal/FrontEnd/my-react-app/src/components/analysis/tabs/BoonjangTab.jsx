@@ -40,17 +40,18 @@ export default function BoonjangTab({ inputText }) {
             console.log("[분쟁유형 탭] 백엔드 저장 시작...");
 
             // Spring Boot 백엔드로 저장 요청 (BoonjangDto 형식)
+            // 유사(Yusa)처럼 읽기 좋은 텍스트 형식으로 저장
+            const outputText = `[대분류] ${result.대분류}
+[세부분류] ${result.세부분류}
+[당사자] ${result.당사자}
+[분쟁내용] ${result.분쟁내용}
+[법적성격] ${result.법적성격}${result.분류이유 ? `
+[분류이유] ${result.분류이유}` : ''}${result.키워드?.length > 0 ? `
+[키워드] ${result.키워드.join(', ')}` : ''}`;
+
             const saveData = {
                 boonjang_input: inputText,
-                boonjang_output: JSON.stringify({
-                    대분류: result.대분류,
-                    세부분류: result.세부분류,
-                    당사자: result.당사자,
-                    분쟁내용: result.분쟁내용,
-                    법적성격: result.법적성격,
-                    분류이유: result.분류이유 || "",
-                    키워드: result.키워드 || []
-                }),
+                boonjang_output: outputText,
                 boonjang_mark: 0
             };
 

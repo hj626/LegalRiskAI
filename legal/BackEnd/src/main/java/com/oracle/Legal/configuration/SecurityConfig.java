@@ -40,7 +40,7 @@ public class SecurityConfig {
 			.csrf(AbstractHttpConfigurer::disable)
 			// 인가
         	.authorizeHttpRequests(auth->auth
-                    .requestMatchers( "/css/**", "/images/**", "/js/**", "/favicon.*", "/*/icon-*"
+                    .requestMatchers( "/css/**", "/images/**", "/image/**", "/js/**", "/favicon.*", "/*/icon-*"
                     	         	, "/WEB-INF/views/**").permitAll()
             //login
                     .requestMatchers("/", "/login", "/error**", "/assets/**").permitAll()

@@ -11,6 +11,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.oracle.Legal.dto.AccountDto;
 import com.oracle.Legal.dto.ClientDto;
 import com.oracle.Legal.dto.DashboardDto;
+import com.oracle.Legal.repository.BoonjangRepository;
+import com.oracle.Legal.repository.JogiRepository;
+import com.oracle.Legal.repository.LawRepository;
+import com.oracle.Legal.repository.YusaRepository;
 import com.oracle.Legal.service.AdminDashboardService;
 import com.oracle.Legal.service.ClientService;
 
@@ -22,6 +26,10 @@ import lombok.RequiredArgsConstructor;
 public class MainController {
 
     private final ClientService clientService;
+    private final LawRepository lawRepository;
+    private final YusaRepository yusaRepository;
+    private final JogiRepository jogiRepository;
+    private final BoonjangRepository boonjangRepository;
     private final AdminDashboardService adminDashboardService;
 
     @GetMapping("/")
@@ -46,8 +54,21 @@ public class MainController {
 
             if (clientCode != null) {
                 ClientDto user = clientService.getSingleClient(clientCode);
+                
+                long cntLaw      = lawRepository.countByClientCode(clientCode);
+                long cntYusa     = yusaRepository.countByClientCode(clientCode);
+                long cntJogi     = jogiRepository.countByClientCode(clientCode);
+                long cntBoonjang = boonjangRepository.countByClientCode(clientCode);
+
+                model.addAttribute("cntLaw", cntLaw);
+                model.addAttribute("cntYusa", cntYusa);
+                model.addAttribute("cntJogi", cntJogi);
+                model.addAttribute("cntBoonjang", cntBoonjang);
                 model.addAttribute("user", user);
                 model.addAttribute("favorites", clientService.getFavorites(clientCode));
+                
+                
+                
             }
 
             boolean isAdmin = auth.getAuthorities().stream()

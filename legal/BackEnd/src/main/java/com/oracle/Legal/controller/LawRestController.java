@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/law")			
 public class LawRestController {
 	
+	//hj
 	private final LawService lawService;		
 	
     @PostMapping("/save")

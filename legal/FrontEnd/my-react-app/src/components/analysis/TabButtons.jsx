@@ -13,9 +13,9 @@ import React from "react";
 // 탭 정보 배열
 const TABS = [
   { id: "dispute",  label: "분쟁 유형",   icon: "⚖️" },
-  { id: "risk",     label: "법적 리스크", icon: "⚠️" },
+  { id: "solution",     label: "승소율 분석", icon: "💡" },
   { id: "similar",  label: "유사 판례",   icon: "🔍" },
-  { id: "solution", label: "해결 전략",   icon: "💡" },
+  { id: "risk", label: "위험도 분석",   icon: "⚠️" },
 ];
 
 export default function TabButtons({ activeTab, onTabChange }) {

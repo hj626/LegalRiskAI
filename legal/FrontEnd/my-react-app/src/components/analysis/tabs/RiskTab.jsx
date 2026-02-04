@@ -1,21 +1,27 @@
+// 법적 리스크 탭 컴포넌트
+// 위험도   /analyze/legal-risk API 호출
+
 import React, { useState } from "react";
 import axios from "axios";
 
 /**
- * 리스크 탭 컴포넌트
- * - 자체 분석 버튼 보유
- * - /risk-analyze API 호출
- * - 승소율, 위험도, 형량, 벌금 표시
+* - 자체 분석 버튼 보유
+ * - AI 요약 및 해결책 표시
  * - 저장 기능 추가
  */
 
-const API_BASE = "http://localhost:8000";
+// fast apu서버 주소
+const API_BASE = "http://localhost:8002"; 
+
+// 백엔드 api주소
 const BACKEND_API = "http://localhost:8484";
 
-export default function RiskTab({ inputText }) {
+
+export default function SolutionTab({ inputText }) {
     const [result, setResult] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [copied, setCopied] = useState(false);
     const [saving, setSaving] = useState(false);
     const [saveSuccess, setSaveSuccess] = useState(false);
 
@@ -31,11 +37,11 @@ export default function RiskTab({ inputText }) {
 
         try {
             const outputText = `[법적 리스크 분석 결과]
-[승소율] ${(result.win_rate || 0).toFixed(1)}%
-[위험도] ${(result.risk || 0).toFixed(0)}/100${result.sentence > 0.1 ? `
-[예상 형량] ${(result.sentence || 0).toFixed(1)}년` : ""}${result.fine > 10000 ? `
-[예상 벌금] ${(result.fine || 0).toLocaleString()}원` : ""}${result.feedback ? `
-[AI 피드백] ${result.feedback}` : ""}`;
+
+[위험도] ${result.risk}%
+[사건 유형] ${result.case_type}
+[예상 형량] ${result.sentence}
+[예상 벌금] ${result.fine.toLocaleString()}원`;
 
             await axios.post(`${BACKEND_API}/api/law/save`, {
                 law_input: inputText,
@@ -46,12 +52,13 @@ export default function RiskTab({ inputText }) {
             setSaveSuccess(true);
             setTimeout(() => setSaveSuccess(false), 3000);
         } catch (err) {
-            console.error("[리스크 탭] 저장 오류:", err);
+            console.error("[법적 리스크 탭] 저장 오류:", err);
             setError("저장 중 오류가 발생했습니다.");
         } finally {
             setSaving(false);
         }
     };
+
 
     const handleAnalyze = async () => {
         if (!inputText || !inputText.trim()) {
@@ -68,36 +75,68 @@ export default function RiskTab({ inputText }) {
         setError(null);
 
         try {
-            console.log("[리스크 탭] 분석 시작...");
+            console.log("[위험도 분석 탭] 분석 시작.");
 
-            const response = await axios.post(`${API_BASE}/risk-analyze`, {
-                case_text: inputText
+
+            // 2/4추가 hj
+            // jogi - main.py에서 /analyze 엔드포인트와 동일하게 story 내용을 받음
+            const response = await axios.post(`${API_BASE}/analyze/legal-risk`, {
+                story: inputText
             });
 
-            setResult(response.data);
-            console.log("[리스크 탭] 분석 완료:", response.data);
+            const data = response.data;
 
+            if (data.success) {
+                // jogi- main.py와 필드명 동일하게 셋팅
+                setResult({
+                    risk: data.risk,           // 위험도 (0-100)
+                    sentence: data.sentence,   // 예상 형량
+                    fine: data.fine,           // 예상 벌금
+                    case_type: data.case_type  // 사건 종류
+                });
+            console.log("[법적 리스크 탭] 분석 완료");
+        } else {
+            throw new Error("분석에 실패했습니다.");
+        }
+
+    } catch (err) {
+        console.error("[법적 리스크 탭] 분석 오류:", err);
+        setError("AI 서버(8002) 연결 실패. 서버가 켜져 있는지 확인하세요.");
+    } finally {
+        setLoading(false);
+    }
+};
+
+
+    // 복사 기능
+    const handleCopy = async () => {
+        const textToCopy = `[법적 리스크 분석 결과]
+
+위험도: ${result.risk}%
+사건 유형: ${result.case_type}
+예상 형량: ${result.sentence}
+예상 벌금: ${result.fine.toLocaleString()}원`;
+
+        try {
+            await navigator.clipboard.writeText(textToCopy);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
         } catch (err) {
-            console.error("[리스크 탭] 분석 오류:", err);
-            setError(err.response?.data?.detail || "위험도 분석 중 오류가 발생했습니다.");
-        } finally {
-            setLoading(false);
+            console.error("복사 실패:", err);
         }
     };
 
-    // 위험도에 따른 색상
-    const getRiskColor = (riskScore) => {
-        if (riskScore >= 70) return { bg: "bg-red-500", text: "text-red-600" };
-        if (riskScore >= 40) return { bg: "bg-amber-500", text: "text-amber-600" };
-        return { bg: "bg-green-500", text: "text-green-600" };
+    // 위험 수준 색상
+    const getRiskLevelStyle = (riskValue) => {
+        if (riskValue >= 70) {
+            return { bg: "bg-red-100", text: "text-red-700", border: "border-red-200", label: "높음 (긴급)" };
+        } else if (riskValue >= 40) {
+            return { bg: "bg-amber-100", text: "text-amber-700", border: "border-amber-200", label: "중간" };
+        } else {
+            return { bg: "bg-green-100", text: "text-green-700", border: "border-green-200", label: "낮음" };
+        }
     };
 
-    // 승소율에 따른 색상
-    const getWinRateColor = (winRate) => {
-        if (winRate >= 70) return "text-green-600";
-        if (winRate >= 40) return "text-amber-600";
-        return "text-red-600";
-    };
 
     // =====================
     // 렌더링
@@ -107,14 +146,15 @@ export default function RiskTab({ inputText }) {
         return (
             <div className="flex flex-col items-center justify-center py-24 px-6">
                 <div className="relative w-20 h-20 mb-6">
-                    <div className="absolute inset-0 border-4 border-amber-200 rounded-full"></div>
-                    <div className="absolute inset-0 border-4 border-amber-600 rounded-full border-t-transparent animate-spin"></div>
+                    <div className="absolute inset-0 border-4 border-emerald-200 rounded-full"></div>
+                    <div className="absolute inset-0 border-4 border-emerald-600 rounded-full border-t-transparent animate-spin"></div>
                 </div>
                 <h3 className="text-lg font-semibold text-slate-800 mb-2">법적 리스크 분석 중...</h3>
-                <p className="text-sm text-slate-600">AI가 위험도를 예측하고 있습니다.</p>
+                <p className="text-sm text-slate-600">위험도, 형량, 벌금을 분석하고 있습니다.</p>
             </div>
         );
     }
+
 
     if (error) {
         return (
@@ -136,54 +176,46 @@ export default function RiskTab({ inputText }) {
     if (!result) {
         return (
             <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
-                <div className="text-6xl mb-4">⚠️</div>
+                <div className="text-6xl mb-4">⚖️</div>
                 <h3 className="text-xl font-semibold text-slate-800 mb-2">법적 리스크 분석</h3>
                 <p className="text-slate-600 mb-8">
-                    예상 승소율, 위험도, 형량, 벌금 등을 AI로 예측합니다.
+                    AI가 위험도, 예상 형량, 예상 벌금을 분석합니다.
                 </p>
 
                 <button
                     onClick={handleAnalyze}
-                    className="px-8 py-4 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white text-base font-semibold rounded-xl transition-all duration-300 hover:shadow-[0_8px_30px_rgba(245,158,11,0.4)] hover:scale-105 active:scale-95"
+                    className="px-8 py-4 bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 text-white text-base font-semibold rounded-xl transition-all duration-300 hover:shadow-[0_8px_30px_rgba(16,185,129,0.4)] hover:scale-105 active:scale-95"
                 >
-                    ⚠️ 리스크 분석하기
+                    💡 법적 리스크 분석하기
                 </button>
             </div>
         );
     }
 
-    // 결과가 실패인 경우
-    if (!result.success) {
-        return (
-            <div className="p-6">
-                <div className="bg-amber-50 border border-amber-200 rounded-xl p-6 text-center">
-                    <span className="text-4xl mb-4 block">⚠️</span>
-                    <p className="text-amber-700 font-medium">위험도 분석 서비스를 사용할 수 없습니다.</p>
-                    <p className="text-amber-600 text-sm mt-2">{result.error || result.detail}</p>
-                </div>
-            </div>
-        );
-    }
-
     // 결과 표시
-    const { win_rate, risk, sentence, fine, feedback } = result;
-    const riskColor = getRiskColor(risk || 0);
+    const riskStyle = getRiskLevelStyle(result.risk);
 
     return (
         <div className="space-y-6 p-6">
             <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-slate-800">⚠️ 법적 리스크 분석 결과</h3>
+                <h3 className="text-lg font-semibold text-slate-800">💡 법적 리스크 분석결과</h3>
                 <div className="flex gap-2">
                     <button
                         onClick={handleSave}
                         disabled={saving}
                         className="px-4 py-2 text-sm bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition disabled:opacity-50"
                     >
-                        {saving ? "저장 중..." : saveSuccess ? "✅ 저장됨" : "💾 저장"}
+                        {saving ? "저장 중." : saveSuccess ? "✅ 저장됨" : "💾 저장"}
+                    </button>
+                    <button
+                        onClick={handleCopy}
+                        className="px-4 py-2 text-sm bg-slate-50 text-slate-600 rounded-lg hover:bg-slate-100 transition"
+                    >
+                        {copied ? "✅ 복사됨!" : "📋 복사"}
                     </button>
                     <button
                         onClick={handleAnalyze}
-                        className="px-4 py-2 text-sm bg-amber-50 text-amber-600 rounded-lg hover:bg-amber-100 transition"
+                        className="px-4 py-2 text-sm bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 transition"
                     >
                         🔄 다시 분석
                     </button>
@@ -197,81 +229,61 @@ export default function RiskTab({ inputText }) {
                 </div>
             )}
 
-            {/* 승소율 */}
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100">
-                <h4 className="text-base font-semibold text-slate-800 mb-4">📊 예상 승소율</h4>
-                <div className="flex justify-between items-center mb-3">
-                    <span className="text-sm text-slate-600">승소 가능성:</span>
-                    <span className={`text-2xl font-bold ${getWinRateColor(win_rate || 0)}`}>
-                        {(win_rate || 0).toFixed(1)}%
-                    </span>
-                </div>
-                <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
-                    <div
-                        className={`h-full rounded-full transition-all ${(win_rate || 0) >= 70 ? "bg-green-500" :
-                            (win_rate || 0) >= 40 ? "bg-amber-500" : "bg-red-500"
-                            }`}
-                        style={{ width: `${win_rate || 0}%` }}
-                    />
-                </div>
-                <p className="text-xs text-slate-500 mt-2">유사 판례 분석 기반 예측</p>
-            </div>
-
             {/* 위험도 */}
-            <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-6 border border-amber-100">
-                <h4 className="text-base font-semibold text-slate-800 mb-4">⚠️ 위험도 평가</h4>
-                <div className="flex justify-between items-center mb-3">
-                    <span className="text-sm text-slate-600">위험도 점수:</span>
-                    <span className={`text-2xl font-bold ${riskColor.text}`}>
-                        {(risk || 0).toFixed(0)}/100
+            <div className={`rounded-xl p-6 border ${riskStyle.bg} ${riskStyle.border}`}>
+                <div className="flex items-center gap-4">
+                    <span className="text-4xl">
+                        {result.risk >= 70 ? "🔴" : result.risk >= 40 ? "🟡" : "🟢"}
                     </span>
+                    <div className="flex-1">
+                        <div className="text-sm text-slate-600 mb-1">법적 위험도</div>
+                        <div className={`text-3xl font-bold ${riskStyle.text}`}>
+                            {result.risk}%
+                        </div>
+                        <div className="text-sm text-slate-600 mt-1">
+                            위험 수준: {riskStyle.label}
+                        </div>
+                    </div>
                 </div>
-                <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
-                    <div
-                        className={`h-full rounded-full transition-all ${riskColor.bg}`}
-                        style={{ width: `${risk || 0}%` }}
-                    />
-                </div>
-                <p className="text-xs text-slate-500 mt-2">높을수록 주의가 필요합니다</p>
             </div>
 
-            {/* 형량 (0.1년 이상일 때만) */}
-            {sentence > 0.1 && (
-                <div className="bg-gradient-to-br from-red-50 to-rose-50 rounded-xl p-6 border border-red-100">
-                    <h4 className="text-base font-semibold text-slate-800 mb-4">⚖️ 예상 형량</h4>
-                    <div className="flex justify-between items-center mb-3">
-                        <span className="text-sm text-slate-600">형량:</span>
-                        <span className="text-2xl font-bold text-red-600">
-                            {(sentence || 0).toFixed(1)}년
-                        </span>
-                    </div>
-                    <p className="text-xs text-slate-500">유사 사건 판례 기반 예측</p>
-                </div>
-            )}
 
-            {/* 벌금 (1만원 이상일 때만) */}
-            {fine > 10000 && (
-                <div className="bg-gradient-to-br from-violet-50 to-purple-50 rounded-xl p-6 border border-violet-100">
-                    <h4 className="text-base font-semibold text-slate-800 mb-4">💰 예상 벌금</h4>
-                    <div className="flex justify-between items-center mb-3">
-                        <span className="text-sm text-slate-600">벌금액:</span>
-                        <span className="text-2xl font-bold text-violet-600">
-                            {(fine || 0).toLocaleString()}원
-                        </span>
-                    </div>
-                    <p className="text-xs text-slate-500">유사 사건 판례 기반 예측</p>
+            {/* 예상 형량 */}
+            <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-100">
+                <h4 className="text-base font-semibold text-slate-800 mb-3">⏱️ 예상 형량</h4>
+                <div className="text-2xl font-bold text-purple-700">
+                    {result.sentence}
                 </div>
-            )}
+            </div>
 
-            {/* Gemini 피드백 (있을 경우) */}
-            {feedback && (
-                <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-xl p-6 border border-indigo-100">
-                    <h4 className="text-base font-semibold text-slate-800 mb-4">🤖 AI 피드백 (Gemini)</h4>
-                    <div className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">
-                        {feedback}
-                    </div>
+            {/* 예상 벌금 */}
+            <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-6 border border-orange-100">
+                <h4 className="text-base font-semibold text-slate-800 mb-3">💰 예상 벌금</h4>
+                <div className="text-2xl font-bold text-orange-700">
+                    {result.fine.toLocaleString()}원
                 </div>
-            )}
+            </div>
+
+
+
+           {/* 다음 단계 가이드 */}
+            <div className="bg-slate-50 rounded-xl p-6 border border-slate-200">
+                <h4 className="text-base font-semibold text-slate-800 mb-4">📋 권장 다음 단계</h4>
+                <ul className="space-y-3">
+                    <li className="flex items-start gap-3">
+                        <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-sm font-medium">1</span>
+                        <span className="text-sm text-slate-600">관련 자료 및 증거를 정리해주세요</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                        <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-sm font-medium">2</span>
+                        <span className="text-sm text-slate-600">법률 전문가에게 상담을 받아보세요</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                        <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-sm font-medium">3</span>
+                        <span className="text-sm text-slate-600">유사 판례의 판결 결과를 참고해주세요</span>
+                    </li>
+                </ul>
+            </div>
         </div>
     );
 }

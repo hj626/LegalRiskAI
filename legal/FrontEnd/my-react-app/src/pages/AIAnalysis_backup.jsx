@@ -21,9 +21,9 @@ export default function AIAnalysis() {
 
     const tabs = [
         { id: "dispute", label: "분쟁 유형", icon: "⚖️" },
-        { id: "risk", label: "법적 리스크", icon: "⚠️" },
+        { id: "solution", label: "승소율 분석", icon: "💡" },
         { id: "similar", label: "유사 판례", icon: "🔍" },
-        { id: "solution", label: "해결 전략", icon: "💡" }
+        { id: "risk", label: "위험도 분석", icon: "⚠️" }
     ];
 
     const handleAnalyze = async () => {
@@ -136,9 +136,9 @@ export default function AIAnalysis() {
             copyText += "\n";
         }
 
-        // 해결 전략
+        // 위험도 분석
         if (analysisResult.summary) {
-            copyText += "💡 해결 전략:\n";
+            copyText += "💡 위험도 분석:\n";
             copyText += analysisResult.summary + "\n";
         }
 
@@ -218,20 +218,20 @@ export default function AIAnalysis() {
                     title: "분쟁 유형 분석",
                     description: "사건의 법적 성격을 규명하고 핵심 쟁점을 도출합니다."
                 },
-                risk: {
-                    icon: "⚠️",
-                    title: "법적 리스크 분석",
-                    description: "예상 승소율, 위험도, 형량, 벌금 등을 AI로 예측합니다."
+                solution: {
+                    icon: "💡",
+                    title: "승소율 분석",
+                    description: "승소율 예측 및 피드백을 제공합니다."
                 },
                 similar: {
                     icon: "🔍",
                     title: "유사 판례 검색",
                     description: "과거 유사 사건의 판례를 찾아 참고자료를 제공합니다."
                 },
-                solution: {
-                    icon: "💡",
-                    title: "해결 전략",
-                    description: "AI 전문가 피드백과 권장 대응 방안을 제시합니다."
+                risk: {
+                    icon: "⚠️",
+                    title: "위험도 분석",
+                    description: "사건에 대한 나의 현재 위험도를 분석해드립니다."
                 }
             };
 
@@ -440,7 +440,7 @@ export default function AIAnalysis() {
 
         return (
             <div className="space-y-6 p-6">
-                <h3 className="text-lg font-semibold text-slate-800 mb-4">💡 해결 전략</h3>
+                <h3 className="text-lg font-semibold text-slate-800 mb-4">💡 위험도 분석</h3>
 
                 {summary && (
                     <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-6 border border-blue-100">
@@ -461,7 +461,7 @@ export default function AIAnalysis() {
                 )}
 
                 {!summary && !feedback && (
-                    <p className="text-amber-600 bg-amber-50 p-4 rounded-lg border border-amber-200">해결 전략 정보가 없습니다.</p>
+                    <p className="text-amber-600 bg-amber-50 p-4 rounded-lg border border-amber-200">위험도 분석 정보가 없습니다.</p>
                 )}
             </div>
         );

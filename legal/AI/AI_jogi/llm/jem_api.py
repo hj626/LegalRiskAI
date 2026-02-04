@@ -1,11 +1,17 @@
-# legal_analyzer.py
-import google.generativeai as genai
+# jem_api.py
+from google import genai
 import torch
 import pickle
 from transformers import AutoTokenizer
 import json
+import os
+
 from typing import Dict, Any
-from llm.model import MultiTaskLegalBERT #내가 만든 모델 불러와
+from .model import MultiTaskLegalBERT #같은 폴더안에 내가 만든 모델.py에서 모델 불러와
+
+
+
+
 
 class LegalAnalyzer:
     """법률 사건 분석 클래스 (BERT + Gemini)"""
@@ -21,13 +27,49 @@ class LegalAnalyzer:
         self.tokenizer = AutoTokenizer.from_pretrained("klue/bert-base")
         
         #모델로드/딥러닝했던 모델 불러와 
-        self.model = MultiTaskLegalBERT.from_pretrained(
-            model_path, num_labels=3).to(self.device)
+        # 이건 자동화 실행
+        # self.model = MultiTaskLegalBERT.from_pretrained( #from_pretrained허깅페이스에서 모델을 직관적으로가져오게 하는 거야
+        #     model_path, num_labels=3).to(self.device)
+        
+        # 이건 직접 가서 내가 필요한 모델을 불러오겠다는것
+        # self.model = MultiTaskLegalBERT(num_labels=3).to(self.device)
+        self.model = MultiTaskLegalBERT(
+        model_name="klue/bert-base",  # 👈 엔진 선택
+        num_labels=3).to(self.device)
+     
+        
+        model_file = os.path.join(model_path, "pytorch_model.bin")
+        
+        # 파일을 불러옵니다 (상자 가져오기)
+        checkpoint = torch.load(model_file,
+                                map_location=self.device,
+                                weights_only=False #이건 안전한 파일이니까 보안 해제해도돼
+                                )
+        
+        
+        # 'model_state_dict'라는 알맹이가 있는지 확인하고 가중치만 추출
+        if isinstance(checkpoint, dict) and 'model_state_dict' in checkpoint:
+            state_dict = checkpoint['model_state_dict']
+            print("✅ 딕셔너리 포장을 풀고 가중치를 추출했습니다.")
+        else:
+            state_dict = checkpoint
+            print("✅ 일반 가중치 파일을 로드했습니다.")
+            
+        # 모델 뼈대에 추출한 가중치를 주입합니다.
+        self.model.load_state_dict(state_dict)
+        
+        
+        
+        
+        
+        
         self.model.eval()
         
         # llm 불러와 / Gemini 설정
-        genai.configure(api_key=gemini_api_key)
-        self.gemini_model = genai.GenerativeModel('gemini-pro')
+        # genai.configure(api_key=gemini_api_key)
+        # self.gemini_model = genai.GenerativeModel('gemini-pro')
+        self.client = genai.Client(api_key=gemini_api_key)
+        self.model_name = "gemini-2.5-flash"
         
         # # 클래스 이름 로드
         # with open(f"{model_path}/config.json", 'r') as f:
@@ -56,7 +98,7 @@ class LegalAnalyzer:
         # case_type_idx = logits.argmax(-1).item()
         
         return {
-           # 'case_type': self.class_names[case_type_idx],
+           'case_type': "법률 사건 분석", #self.class_names[case_type_idx],
             'win_rate': max(0, min(100, outputs['win_rate'].item())),
             'sentence': max(0, outputs['sentence'].item()),
             'fine': max(0, outputs['fine'].item()),
@@ -99,7 +141,11 @@ class LegalAnalyzer:
    - 추천 전문 분야
 """
         
-        response = self.gemini_model.generate_content(prompt)
+        # response = self.gemini_model.generate_content(prompt)
+        response = self.client.models.generate_content(
+            model=self.model_name,
+            contents=prompt
+        )
         return response.text
     
     def analyze(self, story: str) -> Dict[str, Any]:

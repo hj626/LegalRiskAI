@@ -1,4 +1,4 @@
-# models.py
+# model.py
 import torch.nn as nn
 from transformers import BertModel
 
@@ -76,8 +76,14 @@ class MultiTaskLegalBERT(nn.Module):
         model = cls("klue/bert-base", num_labels=num_labels)
         
         # 가중치 로드
+        # state_dict = torch.load(f"{model_path}/pytorch_model.bin", 
+        #                         map_location=torch.device('cpu'))
+        
+        # weights_only=False를 추가하여 모델을 정상적으로 로드합니다.
         state_dict = torch.load(f"{model_path}/pytorch_model.bin", 
-                                map_location=torch.device('cpu'))
+                                map_location=torch.device('cpu'),
+                                weights_only=False)
+        
         model.load_state_dict(state_dict)
         
         return model

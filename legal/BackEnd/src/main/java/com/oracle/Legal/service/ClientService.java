@@ -1,5 +1,8 @@
 package com.oracle.Legal.service;
+import java.util.List;
+
 import com.oracle.Legal.dto.ClientDto;
+import com.oracle.Legal.dto.HistoryDto;
 import com.oracle.Legal.dto.PageDto;
 
 public interface ClientService {
@@ -16,6 +19,7 @@ public interface ClientService {
 
 	void updateClientIsDel(int clientCode, int clientIsDel);
 	
+    List<HistoryDto> getFavorites(int clientCode);
 
 
 }

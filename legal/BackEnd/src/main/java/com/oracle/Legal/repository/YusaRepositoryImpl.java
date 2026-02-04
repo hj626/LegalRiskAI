@@ -69,4 +69,16 @@ public class YusaRepositoryImpl implements YusaRepository {
 	        .setParameter("code", code)
 	        .executeUpdate();
 	    }
+	
+	@Override
+	public long countByClientCode(int clientCode) {
+	    Long cnt = em.createQuery(
+	        "select count(y) from Yusa y where y.client_code = :cc",
+	        Long.class
+	    ).setParameter("cc", clientCode)
+	     .getSingleResult();
+
+	    return cnt == null ? 0L : cnt;
+	}
+
 }

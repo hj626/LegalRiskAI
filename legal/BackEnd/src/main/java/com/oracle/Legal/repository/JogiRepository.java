@@ -16,4 +16,6 @@ public interface JogiRepository {
 	void deleteById(int code);
 	//즐겨찾기 토글 
 	void toggleMark(int code);
+	//jogi 카운트 
+	long countByClientCode(int clientCode);
 }

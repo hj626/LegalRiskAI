@@ -25,4 +25,6 @@ public interface BoonjangRepository {
 	void deleteById(int code);
 	//즐겨찾기 토글 
 	void toggleMark(int code);
+	//분쟁 count
+	long countByClientCode(int clientCode);
 }

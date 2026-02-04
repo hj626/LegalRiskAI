@@ -159,7 +159,6 @@
       <div class="glass p-4">
         <div class="mb-3">
           <div class="fw-bold fs-4">내 사건 분석 이력</div>
-          <div class="text-muted small">client_code 기준으로 분석 내역이 표시됩니다.</div>
         </div>
 
         <!-- 필터 + 선택삭제 -->
@@ -168,7 +167,7 @@
             <select class="form-select form-select-sm" style="width: 180px;"
 			onchange="location.href='${pageContext.request.contextPath}/mypage/main?serviceType=' + this.value + '&page=1&size=${size}';">
               <option value="">전체</option>
-              <option value="JOGI" ${param.serviceType == 'JOGI' ? 'selected' : ''}>조기위험</option>
+              <option value="JOGI" ${param.serviceType == 'JOGI' ? 'selected' : ''}>승소율 측정</option>
               <option value="LAW" ${param.serviceType == 'LAW' ? 'selected' : ''}>법적위험</option>
               <option value="BOONJANG" ${param.serviceType == 'BOONJANG' ? 'selected' : ''}>분쟁위험</option>
               <option value="YUSA" ${param.serviceType == 'YUSA' ? 'selected' : ''}>유사판례</option>
@@ -240,7 +239,7 @@
                         <td>
                           <c:choose>
                             <c:when test="${h.serviceType == 'JOGI'}">
-                              <span class="chip" style="background:#ecfeff; color:#0e7490;">조기위험</span>
+                              <span class="chip" style="background:#ecfeff; color:#0e7490;">승소율 측정</span>
                             </c:when>
                             <c:when test="${h.serviceType == 'LAW'}">
                               <span class="chip" style="background:#fef2f2; color:#b91c1c;">법적위험</span>

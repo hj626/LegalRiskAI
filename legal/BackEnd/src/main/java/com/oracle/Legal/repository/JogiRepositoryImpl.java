@@ -68,4 +68,16 @@ public class JogiRepositoryImpl implements JogiRepository {
         .setParameter("code", code)
         .executeUpdate();
     }
+	
+	@Override
+	public long countByClientCode(int clientCode) {
+	    Long cnt = em.createQuery(
+	        "select count(j) from Jogi j where j.client_code = :cc",
+	        Long.class
+	    ).setParameter("cc", clientCode)
+	     .getSingleResult();
+
+	    return cnt == null ? 0L : cnt;
+	}
+
 }

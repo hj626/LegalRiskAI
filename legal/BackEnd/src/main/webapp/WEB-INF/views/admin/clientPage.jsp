@@ -90,7 +90,7 @@
                                                 </td>
 
                                                 <td>
-													<a class="btn btn-sm btn-outline-primary"
+													<a class="btn btn-sm btn-outline-primary text-nowrap"
 													   href="${pageContext.request.contextPath}/admin/client/${c.client_code}?page=${page}&size=${size}">
 													   상세보기
 													</a>
@@ -104,7 +104,7 @@
 
                         <!-- 페이징 -->
                         <nav class="mt-3">
-                            <ul class="pagination pagination-sm justify-content-center mb-0">
+                            <ul class="pagination pagination-sm justify-content-center mb-0">	
                                 <c:set var="baseUrl" value="${pageContext.request.contextPath}/admin/main?size=${size}" />
 
                                 <li class="page-item <c:if test='${page <= 1}'>disabled</c:if>">

@@ -55,8 +55,8 @@
 
                                 <!-- 이미지 영역 -->
                                 <div class="col-md-6 text-center">
-                                   <img src="<c:url value='/resources/image/accessban.jpg'/>"
-     								class="img-fluid" alt="접근 제한 안내 이미지">
+									<img src="<c:url value='/image/accessban.jpg'/>"
+									     class="img-fluid" alt="접근 제한 안내 이미지">
                                 </div>
                             </div>
                         </div><!-- card-body -->

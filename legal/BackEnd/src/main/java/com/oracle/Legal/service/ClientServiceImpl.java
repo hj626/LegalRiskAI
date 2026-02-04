@@ -1,6 +1,7 @@
 package com.oracle.Legal.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.oracle.Legal.domain.Account;
 import com.oracle.Legal.domain.Client;
 import com.oracle.Legal.dto.ClientDto;
+import com.oracle.Legal.dto.HistoryDto;
 import com.oracle.Legal.dto.PageDto;
 import com.oracle.Legal.repository.AccountRepository;
 import com.oracle.Legal.repository.ClientRepository;
@@ -26,6 +28,7 @@ public class ClientServiceImpl implements ClientService {
 	private final AccountRepository accountRepository;
 	private final ModelMapper modelMapper;
 	private final PasswordEncoder passwordEncoder;
+	private final MyPageService myPageService;
 	private final EntityManager em;
 
 	
@@ -114,5 +117,16 @@ public class ClientServiceImpl implements ClientService {
         }
 
         client.setClient_is_del(clientIsDel);
+    }
+    
+    //메인 즐겨찾기 
+    @Override
+    public List<HistoryDto> getFavorites(int clientCode) {
+        List<HistoryDto> all = myPageService.getAllHistory(clientCode);
+
+        return all.stream()
+                .filter(h -> h.getMark() == 1)
+                .limit(10)
+                .collect(Collectors.toList());
     }
 }

@@ -68,4 +68,16 @@ public class LawRepositoryImpl implements LawRepository {
         .setParameter("code", code)
         .executeUpdate();
     }
+	
+	@Override
+	public long countByClientCode(int clientCode) {
+	    Long cnt = em.createQuery(
+	        "select count(l) from Law l where l.client_code = :cc",
+	        Long.class
+	    ).setParameter("cc", clientCode)
+	     .getSingleResult();
+
+	    return cnt == null ? 0L : cnt;
+	}
+
 }

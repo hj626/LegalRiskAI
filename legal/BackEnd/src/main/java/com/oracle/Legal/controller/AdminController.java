@@ -11,6 +11,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.oracle.Legal.dto.ClientDto;
 import com.oracle.Legal.dto.PageDto;
+import com.oracle.Legal.repository.BoonjangRepository;
+import com.oracle.Legal.repository.JogiRepository;
+import com.oracle.Legal.repository.LawRepository;
+import com.oracle.Legal.repository.YusaRepository;
 import com.oracle.Legal.service.ClientService;
 
 import lombok.RequiredArgsConstructor;
@@ -22,6 +26,10 @@ public class AdminController {
 	
 	
 	private final ClientService clientService; 
+    private final LawRepository lawRepository;
+    private final YusaRepository yusaRepository;
+    private final JogiRepository jogiRepository;
+    private final BoonjangRepository boonjangRepository;
 	
     @GetMapping("/main")
     public String AdminClientPage(
@@ -44,8 +52,23 @@ public class AdminController {
     
     @GetMapping("/client/{clientCode}")
     public String clientDetail(@PathVariable("clientCode") int clientCode, Model model) {
+
         ClientDto client = clientService.getSingleClient(clientCode);
         model.addAttribute("client", client);
+
+        long cntLaw      = lawRepository.countByClientCode(clientCode);      
+        long cntYusa     = yusaRepository.countByClientCode(clientCode);     
+        long cntJogi     = jogiRepository.countByClientCode(clientCode);     
+        long cntBoonjang = boonjangRepository.countByClientCode(clientCode); 
+
+        long totalUsage = cntLaw + cntYusa + cntJogi + cntBoonjang;
+
+        model.addAttribute("cntLaw", cntLaw);
+        model.addAttribute("cntYusa", cntYusa);
+        model.addAttribute("cntJogi", cntJogi);
+        model.addAttribute("cntBoonjang", cntBoonjang);
+        model.addAttribute("totalUsage", totalUsage);
+
         System.out.println("상세보기페이지 실행");
         return "admin/clientDetail";
     }

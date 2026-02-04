@@ -74,4 +74,14 @@ public class BoonjangRepositoryImpl implements BoonjangRepository {
         .executeUpdate();
     }
 	
+	@Override
+	public long countByClientCode(int clientCode) {
+	    Long cnt = em.createQuery(
+	        "select count(b) from Boonjang b where b.client_code = :cc",
+	        Long.class
+	    ).setParameter("cc", clientCode)
+	     .getSingleResult();
+
+	    return cnt == null ? 0L : cnt;
+	}
 }

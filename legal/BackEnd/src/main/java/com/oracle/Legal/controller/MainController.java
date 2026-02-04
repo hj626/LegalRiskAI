@@ -5,12 +5,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.oracle.Legal.dto.AccountDto;
 import com.oracle.Legal.dto.ClientDto;
+import com.oracle.Legal.dto.DashboardDto;
+import com.oracle.Legal.service.AdminDashboardService;
 import com.oracle.Legal.service.ClientService;
-import com.oracle.Legal.service.AdminDashboardService;   
-import com.oracle.Legal.dto.DashboardDto;               
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -42,10 +44,10 @@ public class MainController {
                 }
             }
 
-            // 유저 정보
             if (clientCode != null) {
                 ClientDto user = clientService.getSingleClient(clientCode);
                 model.addAttribute("user", user);
+                model.addAttribute("favorites", clientService.getFavorites(clientCode));
             }
 
             boolean isAdmin = auth.getAuthorities().stream()
@@ -59,4 +61,11 @@ public class MainController {
 
         return "main";
     }
+    
+    @PostMapping("/mypage/history/detail")
+    public String goDetail(@RequestParam String serviceType,
+                           @RequestParam Long serviceCode) {
+        return "redirect:/history/" + serviceType + "/" + serviceCode;
+    }
+
 }

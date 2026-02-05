@@ -1,6 +1,7 @@
 package com.oracle.Legal.dto;
 
 import java.util.Date;
+
 import lombok.*;
 
 @Getter @Setter
@@ -14,4 +15,7 @@ public class HistoryDto {
     private String input;         
     private String output;        
     private int mark;
+    
+    //조기 승소율
+    private Integer jogiWinrate;
 }

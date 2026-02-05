@@ -189,19 +189,22 @@ public class MyPageService {
                 .mark(l.getYusa_mark())
                 .build();
     }
-    //조기위험 서비스코드로 찾기
+  //조기위험 서비스코드로 찾기
     public HistoryDto getJogiHistoryDetail(int clientCode, String serviceType, Long serviceCode) {
 
         Jogi l = jogiRepository.findOne(clientCode, serviceCode.intValue());
 
-        return HistoryDto.builder()
-                .serviceType("JOGI")
+        HistoryDto detail = HistoryDto.builder()
+                .serviceType(serviceType)  
                 .serviceCode(serviceCode)
                 .analysisDate(java.sql.Timestamp.valueOf(l.getJogi_date()))
                 .input(l.getJogi_input())
                 .output(l.getJogi_output())
                 .mark(l.getJogi_mark())
                 .build();
+        		detail.setJogiWinrate(l.getJogi_winrate());
+
+        return detail;
     }
 
     //분쟁위험 서비스코드로 찾기
@@ -226,7 +229,7 @@ public class MyPageService {
 		        return getLawHistoryDetail(clientCode, t, code);
 		    } else if ("YUSA".equals(t)) {
 		        return getYusaHistoryDetail(clientCode, t, code);
-		    } else if ("JOGI".equals(t)) {
+		    } else if ("JOGI".equals(t) || "JOGI_WINRATE".equals(t)) {
 		        return getJogiHistoryDetail(clientCode, t, code);
 		    } else if ("BOONJANG".equals(t)) {
 		        return getBoonjangHistoryDetail(clientCode, t, code);

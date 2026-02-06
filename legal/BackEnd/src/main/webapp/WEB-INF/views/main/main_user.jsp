@@ -163,13 +163,9 @@
       <div class="w-full lg:w-1/2 h-full flex items-center bg-slate-50 px-6 pt-32 pb-16 md:px-16 lg:px-24">
         <div class="max-w-xl">
           <span class="inline-block bg-blue-600/10 text-blue-600 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full mb-8">판례 분석 • 실시간 리스크</span>
-          <h3 class="text-blue-600 font-bold text-lg md:text-xl mb-4">스마트한 법률 비서, LexAI</h3>
+          <h3 class="text-blue-600 font-bold text-lg md:text-xl mb-4">스마트한 법률 비서, LegalRiskAI</h3>
 
-          <p class="text-slate-700 font-black text-base md:text-lg mb-2">
-            <%= (displayName == null || displayName.isBlank()) ? "고객" : displayName %>님
-          </p>
-
-          <h1 class="text-4xl md:text-5xl lg:text-7xl font-black text-slate-900 mb-8 leading-[1.1] whitespace-pre-line">AI 법률 분석의<br>새로운 패러다임</h1>
+          <h1 class="text-4xl md:text-5xl lg:text-7xl font-black text-slate-900 mb-8 leading-[1.1] whitespace-pre-line">법률 고민의<br>인공지능 솔루션<br>지능형 AI 비서</h1>
           <p class="text-lg text-slate-500 mb-12 leading-relaxed max-w-lg">방대한 판례 데이터와 법률 리스크를 실시간으로 분석하여 신속한 의사결정을 지원합니다.</p>
 
           <a href="<c:url value='/login'/>"
@@ -199,7 +195,7 @@
             <%= (displayName == null || displayName.isBlank()) ? "고객" : displayName %>님
           </p>
 
-          <h1 class="text-4xl md:text-5xl lg:text-7xl font-black text-slate-900 mb-8 leading-[1.1] whitespace-pre-line">정밀한 분쟁 유형<br>분석 엔진</h1>
+          <h1 class="text-4xl md:text-5xl lg:text-7xl font-black text-slate-900 mb-8 leading-[1.1] whitespace-pre-line">데이터가 증명하는 승소 AI 법률 전략</h1>
           <p class="text-lg text-slate-500 mb-12 leading-relaxed max-w-lg">사건의 핵심 쟁점을 파악하고 유사 판례를 매칭해 대응 방향을 돕습니다.</p>
 
           <a href="<c:url value='/login'/>"
@@ -226,7 +222,7 @@
             <%= (displayName == null || displayName.isBlank()) ? "고객" : displayName %>님
           </p>
 
-          <h1 class="text-4xl md:text-5xl lg:text-7xl font-black text-slate-900 mb-8 leading-[1.1] whitespace-pre-line">통합 리스크 관리<br>대시보드</h1>
+          <h1 class="text-4xl md:text-5xl lg:text-7xl font-black text-slate-900 mb-8 leading-[1.1] whitespace-pre-line">판례 분석부터<br> 리스크 감지까지,<br>AI로 한 번에</h1>
           <p class="text-lg text-slate-500 mb-12 leading-relaxed max-w-lg">중요 리스크를 한 곳에서 모니터링하고 관리할 수 있습니다.</p>
 
           <a href="<c:url value='/login'/>"
@@ -379,8 +375,8 @@
                   <div class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-10">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" strokeWidth="2"/></svg>
                   </div>
-                  <h3 class="text-2xl font-black text-slate-900 mb-4">스마트 판례 검색</h3>
-                  <p class="text-slate-500 text-lg leading-relaxed">자연어 질문에서도 핵심 법리를 찾아 관련 판례를 제시합니다.</p>
+                  <h3 class="text-2xl font-black text-slate-900 mb-4">지능형 판례 분석</h3>
+                  <p class="text-slate-500 text-lg leading-relaxed">질문 한 줄로 핵심 법리와 최적의 판례를 찾아내는 AI 맞춤 검색</p>
                 </div>
 
                 <div class="feature-card2 inactive min-w-[320px] md:min-w-[380px] bg-white p-10 rounded-[40px] border-2">
@@ -388,15 +384,15 @@
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" strokeWidth="2"/></svg>
                   </div>
                   <h3 class="text-2xl font-black text-slate-900 mb-4">실시간 리스크 진단</h3>
-                  <p class="text-slate-500 text-lg leading-relaxed">문서/상황의 법적 허점을 빠르게 식별해 리스크를 줄입니다.</p>
+                  <p class="text-slate-500 text-lg leading-relaxed">법적 허점과 위험 요소를 AI로 즉시 포착하여 선제적 방어</p>
                 </div>
 
                 <div class="feature-card2 inactive min-w-[320px] md:min-w-[380px] bg-white p-10 rounded-[40px] border-2">
                   <div class="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-blue-600 mb-10">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7" strokeWidth="2"/></svg>
                   </div>
-                  <h3 class="text-2xl font-black text-slate-900 mb-4">비용 효율적 솔루션</h3>
-                  <p class="text-slate-500 text-lg leading-relaxed">리서치 시간을 대폭 단축하여 비용 부담을 줄입니다.</p>
+                  <h3 class="text-2xl font-black text-slate-900 mb-4">압도적 비용 효율</h3>
+                  <p class="text-slate-500 text-lg leading-relaxed">AI 초고속 분석을 통해 검색 시간과 비용의 혁신적 절감</p>
                 </div>
               </div>
             </div>
@@ -528,7 +524,7 @@
           <div style="position:relative; z-index:1;">
             <h3 class="fw-bold mb-2"><%= displayName %>님,<br/>환영합니다</h3>
             <p class="mb-0" style="color:rgba(255,255,255,.85);">
-              LEGALAI 서비스를 이용해주셔서 감사합니다.<br/>
+              LEGALRISKAI 서비스를 이용해주셔서 감사합니다.<br/>
               스마트한 법률 비서가 업무를 지원합니다.
             </p>
           </div>

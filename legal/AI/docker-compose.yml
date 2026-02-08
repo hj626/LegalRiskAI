@@ -1,90 +1,20 @@
-# AI 통합 Docker Compose
-# Ai_boon (분쟁 분류) + Ai_yusa (유사 판례) + AI_jogi (위험도/조기분석) 동시 실행
+version: "3.9"
 
 services:
-  # =====================
-  # 분쟁 유형 분류 AI (Ai_boon)
-  # =====================
   ai-boon:
-    build:
-      context: ./Ai_boon
-      dockerfile: Dockerfile
-    container_name: legal-ai-boon
+    build: ./Ai_boon
+    container_name: legal-ai-boonjang
     ports:
       - "8001:8001"
-    volumes:
-      - ./Ai_boon/saved_models:/app/saved_models:ro
-    environment:
-      - HOST=0.0.0.0
-      - PORT=8001
-      - PYTHONUNBUFFERED=1
-    restart: unless-stopped
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8001/health" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
 
-  # =====================
-  # 유사 판례 검색 AI (Ai_yusa)
-  # =====================
   ai-yusa:
-    build:
-      context: ./Ai_yusa
-      dockerfile: Dockerfile
+    build: ./Ai_yusa
     container_name: legal-ai-yusa
     ports:
-      - "8000:8000"
-    volumes:
-      # 데이터 파일 마운트 - 사용 환경에 맞게 수정 필요
-      - ./Ai_yusa/notebooks:/app/data:ro
-    environment:
-      - HOST=0.0.0.0
-      - PORT=8000
-      - PYTHONUNBUFFERED=1
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
-      - PARQUET_PATH=/app/data/korean_precedents_embedded.parquet
-      - CSV_PATH=/app/data/korean_precedents_clean.csv
-      - FAISS_INDEX_PATH=/app/data/case_index.faiss
-      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:8484,http://localhost:3000}
-    restart: unless-stopped
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8000/" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
+      - "8002:8002"
 
-  # =====================
-  # 위험도/조기 분석 AI (AI_jogi)
-  # =====================
   ai-jogi:
-    build:
-      context: ./AI_jogi
-      dockerfile: Dockerfile
+    build: ./Ai_jogi
     container_name: legal-ai-jogi
     ports:
-      - "8002:8002"
-    volumes:
-      # 학습된 모델 마운트 (있는 경우)
-      - ./AI_jogi/lerning:/app/models:ro
-    environment:
-      - HOST=0.0.0.0
-      - PORT=8002
-      - PYTHONUNBUFFERED=1
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
-      - MODEL_PATH=/app/models/saved_mode3
-      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:8484,http://localhost:3000}
-    restart: unless-stopped
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8002/health" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
-
-# 네트워크 (자동 생성)
-networks:
-  default:
-    name: legal-ai-network
+      - "8003:8003"

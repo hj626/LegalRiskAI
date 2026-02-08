@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  ai-yusa:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: legal-ai-yusa
+    ports:
+      - "8002:8002"
+    volumes:
+      # 데이터가 필요할 때만 마운트
+      - ./data:/app/data:ro
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8002
+      - PYTHONUNBUFFERED=1
+      # 필요 시 LLM 키
+      # - GEMINI_API_KEY=xxxx
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8002/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s

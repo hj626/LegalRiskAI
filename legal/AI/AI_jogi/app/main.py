@@ -1,4 +1,7 @@
 # python -m app.main로 실행
+# 전체 분석 : @app.post("/analyze", response_model=AnalyzeResponse)
+# 승소율 : @app.post("/analyze/win-rate", response_model=WinRateResponse)
+# 위험도 : @app.post("/analyze/legal-risk", response_model=LegalRiskResponse)
 
 
 # 스프링부트 8484
@@ -10,12 +13,17 @@
 엔드포인트:
 - GET  /           : 루트 (서버 정보)
 - GET  /health     : 헬스체크
-- POST /analyze    : 법적 위험도 분석
+
+2/4 hj가 넣은것
+- POST /analyze/legal-risk  : 법적 리스크 분석 (위험율, 형량, 벌금)
+- POST /analyze/win-rate    : 승소율 분석 (승소율, 피드백)
+- POST /analyze    : 전체 분석
+
+
+기존에 있던것
 - POST /risk       : 위험도만 예측
 - POST /early-warning : 조기 위험 감지
 - POST /risk-analyze : 프론트엔드 호환
-
-모델 없이도 Gemini API만으로 분석 가능
 """
 import traceback
 import os
@@ -41,13 +49,21 @@ if LERNING_DIR not in sys.path:
 
 
 from app.config import HOST, PORT, ALLOWED_ORIGINS, MODEL_PATH, GEMINI_API_KEY
-from app.schemas import AnalyzeRequest, AnalyzeResponse, StoryRequest, HealthResponse
+from app.schemas import (
+    # AnalyzeRequest, AnalyzeResponse, StoryRequest, HealthResponse
+    StoryRequest, 
+    AnalyzeRequest,
+    AnalyzeResponse,
+    LegalRiskResponse, 
+    WinRateResponse, 
+    HealthResponse
+)
 
 
 # # Gemini 클라이언트 초기화
 
 # AI모델이 메모리에 정상적으로 올라갔는지 관리용 / 싱글톤 또는 플래그라고 부름
-_analyzer = None
+analyzer = None
 MODEL_AVAILABLE = False
 
 
@@ -129,30 +145,63 @@ async def analyze_case(request: StoryRequest):
     
 
 #사용자가 쓴 사연(reauest.stroy)를 받아서 승소율 및 피드백을 뽑아주는곳
-@app.post("/analyze/win-rate")
-async def analyze_win_rate(request: AnalyzeRequest):
+@app.post("/analyze/win-rate", response_model=WinRateResponse)
+async def analyze_win_rate(request: StoryRequest):
+    
     try:
-        result = analyzer.analyze(request.case_text)
+        result = analyzer.analyze(request.story) 
+        
         return {
-            "win_rate": result.get('win_rate'), #승소 가능성
-            "win_rate_feedback": result.get('feedback'), #제미나이 설명
-            "legal_list": result.get('legal_list', []) #관련 법률
+            "success": True,
+            "win_rate": float(result.get('win_rate', 0.0)),  # 승소 가능성
+            "feedback": result.get('feedback', "분석 내용이 없습니다."),  # 제미나이 설명
+            "legal_list": result.get('legal_list', [])  # 관련 법률 목록
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        error_details = traceback.format_exc()
+        print("❌ 승소율 분석 중 에러 발생!")
+        print(error_details)
+        
+        return {
+            "success": False,
+            "win_rate": 0.0,
+            "feedback": f"분석 중 오류가 발생했습니다: {str(e)}",
+            "legal_list": []
+        }
 
-#사용자가 쓴 사연(reauest.stroy)를 받아서 형량/벌금들을 뽑아주는곳
-@app.post("/analyze/sentence")
-async def analyze_sentence(request: AnalyzeRequest):
+
+
+
+#사용자가 쓴 사연(reauest.stroy)를 받아서 위험율, 형량/벌금들을 뽑아주는곳
+@app.post("/analyze/legal-risk", response_model=LegalRiskResponse)
+async def analyze_legal_risk(request: StoryRequest):
+    
     try:
-        result = analyzer.analyze(request.case_text)
+        result = analyzer.analyze(request.story)
+        
         return {
-            "predicted_sentence": result.get('sentence'), #형량
-            "predicted_fine": result.get('fine'), #벌금
-            "risk_analysis": result.get('risk') #위험도 분석
+            "success": True,
+            "risk": int(round(float(result.get('risk', 0)))),  # 법적 위험도
+            "sentence": f"{float(result.get('sentence', 0)):.1f}년",  # 예상형량
+            "fine": int(round(float(result.get('fine', 0)))),  # 예상 벌금
+            "case_type": result.get('case_type', "일반")  # 사건 종류
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        # 터미널(서버창)에 아주 상세한 에러 로그 보이게하기       
+        
+        error_details = traceback.format_exc()
+        print("❌ 법적 리스크 분석 중 에러 발생!")
+        print(error_details)
+        
+        return {
+            "success": False,
+            "risk": 0,
+            "sentence": "error",
+            "fine": 0,
+            "case_type": "error"
+        }
+
+
 
 
 # 헬스체크 : 서버가 준비되어있는지 체크하는거

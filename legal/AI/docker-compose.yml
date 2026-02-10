@@ -1,20 +1,17 @@
-version: "3.9"
-
 services:
-  ai-boon:
-    build: ./Ai_boon
-    container_name: legal-ai-boonjang
-    ports:
-      - "8001:8001"
 
   ai-yusa:
     build: ./Ai_yusa
     container_name: legal-ai-yusa
     ports:
-      - "8002:8002"
+      - "8000:8000"  
 
-  ai-jogi:
-    build: ./Ai_jogi
+  fastapi:
+    build:
+      context: ./AI_jogi
     container_name: legal-ai-jogi
     ports:
-      - "8003:8003"
+      - "8002:8002"
+    env_file:
+      - ./AI_jogi/.env
+    restart: always

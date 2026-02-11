@@ -58,7 +58,7 @@
       </div>
 
       <nav class="footer-nav">
-        <a href="<%= ctx %>/boonjang">분쟁유형</a>
+<%--         <a href="<%= ctx %>/boonjang">분쟁유형</a> --%>
         <a href="<%= ctx %>/law">법적위험</a>
         <a href="<%= ctx %>/yusa">유사판례</a>
         <a href="<%= ctx %>/jogi">조기위험</a>

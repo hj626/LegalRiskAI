@@ -130,11 +130,11 @@
             <tbody>
               <c:set var="total" value="${empty totalUsage ? 0 : totalUsage}" />
               
-              <tr>
+<%--               <tr>
                 <td>분쟁 유형 분류</td>
                 <td>${cntBoonjang}</td>
                 <td><fmt:formatNumber value="${total==0?0:(cntBoonjang*100.0/total)}" maxFractionDigits="1"/>%</td>
-              </tr>
+              </tr> --%>
               
               <tr>
                 <td>법적 위험 분석</td>
@@ -168,7 +168,6 @@
           (function(){
 
             const data = [
-              ${cntBoonjang},
               ${cntLaw},
               ${cntYusa},
               ${cntJogi},
@@ -181,7 +180,7 @@
             new Chart(document.getElementById('serviceDonut'),{
               type:'doughnut',
               data:{
-                labels:["분쟁유형","법적위험","유사판례","승소율 측정"],
+                labels:["법적위험","유사판례","승소율 측정"],
                 datasets:[{ data:data }]
               },
               options:{

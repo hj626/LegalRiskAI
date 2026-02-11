@@ -147,7 +147,7 @@
         <c:when test="${detail.serviceType eq 'LAW'}">법적리스크 서비스 상세</c:when>
         <c:when test="${detail.serviceType eq 'JOGI'}">승소율 측정 서비스 상세</c:when>
         <c:when test="${detail.serviceType eq 'YUSA'}">유사 판례 서비스 상세</c:when>
-        <c:when test="${detail.serviceType eq 'BOONJANG'}">분쟁유형 서비스 상세</c:when>
+        <%-- <c:when test="${detail.serviceType eq 'BOONJANG'}">분쟁유형 서비스 상세</c:when> --%>
         <c:otherwise>${detail.serviceType} 서비스 상세</c:otherwise>
       </c:choose>
     </div>

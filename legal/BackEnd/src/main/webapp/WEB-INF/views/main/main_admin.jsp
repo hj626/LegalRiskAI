@@ -99,7 +99,7 @@
 
           <!-- ✅ 도넛 아래 숫자(항목별 건수) -->
           <div class="small mt-2">
-            <div class="d-flex justify-content-between"><span>분쟁유형</span><span>${wDispute}건</span></div>
+            <%-- <div class="d-flex justify-content-between"><span>분쟁유형</span><span>${wDispute}건</span></div> --%>
             <div class="d-flex justify-content-between"><span>법적리스크</span><span>${wRisk}건</span></div>
             <div class="d-flex justify-content-between"><span>유사판례</span><span>${wSimilar}건</span></div>
             <div class="d-flex justify-content-between"><span>승소율 측정</span><span>${wJogi}건</span></div>
@@ -131,7 +131,7 @@
 
           <table class="table table-sm mb-0">
             <tbody>
-              <tr><td>분쟁유형</td><td class="text-end">${tDispute}건</td></tr>
+<%--               <tr><td>분쟁유형</td><td class="text-end">${tDispute}건</td></tr> --%>
               <tr><td>법적리스크</td><td class="text-end">${tRisk}건</td></tr>
               <tr><td>유사판례</td><td class="text-end">${tSimilar}건</td></tr>
               <tr><td>승소율 측정</td><td class="text-end">${tJogi}건</td></tr>
@@ -221,7 +221,7 @@
 <script>
 (function () {
   // 주간 총 사용량 도넛
-  const labels = ["분쟁유형", "법적리스크", "유사판례", "승소율 측정"];
+  const labels = ["법적리스크", "유사판례", "승소율 측정"];
   const values = [${wDispute}, ${wRisk}, ${wSimilar}, ${wJogi}];
   const total = values.reduce((a,b)=>a+b,0);
 

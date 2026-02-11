@@ -169,7 +169,7 @@
               <option value="">전체</option>
               <option value="JOGI" ${param.serviceType == 'JOGI' ? 'selected' : ''}>승소율 측정</option>
               <option value="LAW" ${param.serviceType == 'LAW' ? 'selected' : ''}>법적위험</option>
-              <option value="BOONJANG" ${param.serviceType == 'BOONJANG' ? 'selected' : ''}>분쟁위험</option>
+              <%-- <option value="BOONJANG" ${param.serviceType == 'BOONJANG' ? 'selected' : ''}>분쟁위험</option> --%>
               <option value="YUSA" ${param.serviceType == 'YUSA' ? 'selected' : ''}>유사판례</option>
             </select>
           </div>
@@ -244,9 +244,9 @@
                             <c:when test="${h.serviceType == 'LAW'}">
                               <span class="chip" style="background:#fef2f2; color:#b91c1c;">법적위험</span>
                             </c:when>
-                            <c:when test="${h.serviceType == 'BOONJANG'}">
+<%--                             <c:when test="${h.serviceType == 'BOONJANG'}">
                               <span class="chip" style="background:#fefce8; color:#a16207;">분쟁위험</span>
-                            </c:when>
+                            </c:when> --%>
                             <c:when test="${h.serviceType == 'YUSA'}">
                               <span class="chip" style="background:#eef2ff; color:#1d4ed8;">유사판례</span>
                             </c:when>

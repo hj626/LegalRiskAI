@@ -482,9 +482,9 @@
                               <c:when test="${f.serviceType == 'LAW'}">
                                 <span class="chip" style="background:#fef2f2; color:#b91c1c;">법적위험</span>
                               </c:when>
-                              <c:when test="${f.serviceType == 'BOONJANG'}">
+<%--                               <c:when test="${f.serviceType == 'BOONJANG'}">
                                 <span class="chip" style="background:#fefce8; color:#a16207;">분쟁위험</span>
-                              </c:when>
+                              </c:when> --%>
                               <c:when test="${f.serviceType == 'YUSA'}">
                                 <span class="chip" style="background:#eef2ff; color:#1d4ed8;">유사판례</span>
                               </c:when>
@@ -533,10 +533,10 @@
         <div class="card card-soft p-4 mt-4">
           <div class="fw-bold mb-3" style="color:#5b4bff;">나의 서비스</div>
           <div class="row text-center g-2">
-            <div class="col-3">
+<%--             <div class="col-3">
               <div class="fs-2 fw-bold">${cntBoonjang}회</div>
               <div class="text-muted small">분쟁</div>
-            </div>
+            </div> --%>
             <div class="col-3">
               <div class="fs-2 fw-bold">${cntLaw}회</div>
               <div class="text-muted small">법적</div>
@@ -554,39 +554,34 @@
 
       </div>
     </div>
+<div class="row g-4 mt-1">
 
-    <div class="row g-4">
-      <div class="col-12 col-md-3">
-        <div class="feature-card p-4">
-          <div class="feature-ico mb-3">⚖️</div>
-          <div class="fw-bold mb-1">분쟁</div>
-          <div class="text-muted small">진행 중인 분쟁 사례에 대한 절차 안내와 전략 수립을 지원합니다.</div>
-        </div>
-      </div>
+  <div class="col-12 col-md-4">
+    <div class="feature-card p-4">
+      <div class="feature-ico mb-3">⚠️</div>
+      <div class="fw-bold mb-1">법적 리스크</div>
+      <div class="text-muted small">계약서 및 사업 영역에서 잠재 리스크를 사전에 식별합니다.</div>
+    </div>
+  </div>
 
-      <div class="col-12 col-md-3">
-        <div class="feature-card p-4">
-          <div class="feature-ico mb-3">⚠️</div>
-          <div class="fw-bold mb-1">법적 리스크</div>
-          <div class="text-muted small">계약서 및 사업 영역에서 잠재 리스크를 사전에 식별합니다.</div>
-        </div>
-      </div>
+  <div class="col-12 col-md-4">
+    <div class="feature-card p-4">
+      <div class="feature-ico mb-3">🔍</div>
+      <div class="fw-bold mb-1">유사판례</div>
+      <div class="text-muted small">사건과 유사한 판례 및 관련 경향을 분석해드립니다.</div>
+    </div>
+  </div>
 
-      <div class="col-12 col-md-3">
-        <div class="feature-card p-4">
-          <div class="feature-ico mb-3">🔍</div>
-          <div class="fw-bold mb-1">유사판례</div>
-          <div class="text-muted small">사건과 유사한 판례 및 관련 경향을 분석해드립니다.</div>
-        </div>
-      </div>
+  <div class="col-12 col-md-4">
+    <div class="feature-card p-4">
+      <div class="feature-ico mb-3">💡</div>
+      <div class="fw-bold mb-1">승소율 측정</div>
+      <div class="text-muted small">사건 정보를 기반으로 승소 가능성을 예측하고 핵심 근거를 요약합니다.</div>
+    </div>
+  </div>
 
-      <div class="col-12 col-md-3">
-        <div class="feature-card p-4">
-          <div class="feature-ico mb-3">💡</div>
-          <div class="fw-bold mb-1">승소율 측정</div>
-          <div class="text-muted small">사건 정보를 기반으로 승소 가능성을 예측하고 핵심 근거를 요약합니다.</div>
-        </div>
-      </div>
+</div>
+
     </div>
 
   </main>

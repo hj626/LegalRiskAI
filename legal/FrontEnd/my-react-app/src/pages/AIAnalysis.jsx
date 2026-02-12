@@ -18,7 +18,7 @@ import {
  */
 export default function AIAnalysis() {
     const [inputText, setInputText] = useState("");
-    const [activeTab, setActiveTab] = useState("dispute");
+    const [activeTab, setActiveTab] = useState("similar");
 
     // 탭별 컴포넌트 렌더링
     const renderTabContent = () => {

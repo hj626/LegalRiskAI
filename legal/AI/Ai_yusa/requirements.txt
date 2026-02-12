@@ -1,18 +1,32 @@
-# Ai_yusa/requirements.txt
+# Legal AI 통합 시스템 의존성 (Ai_yusa 전용)
 
+# =========================
 # FastAPI
-fastapi==0.109.0
-uvicorn[standard]==0.27.0
-python-multipart==0.0.6
-click==8.1.6
+# =========================
+fastapi==0.128.5
+uvicorn==0.40.0
+pydantic==2.12.5
 
-# ML/AI
-scikit-learn==1.6.1
-lightgbm==4.3.0
-numpy==1.26.3
-pandas==2.2.0
+# =========================
+# AI / ML
+# =========================
+sentence-transformers==5.2.2
+transformers==5.1.0
+faiss-cpu==1.13.2
+huggingface_hub==1.4.1
 
+# =========================
+# Data (판례 데이터)
+# =========================
+pandas==3.0.0
+pyarrow==23.0.0
+
+# =========================
+# LLM (Gemini)
+# =========================
+google-generativeai==0.8.6
+
+# =========================
 # Utils
-pydantic==2.5.3
-python-dotenv==1.0.1
-requests>=2.31.0
+# =========================
+python-dotenv==1.2.1

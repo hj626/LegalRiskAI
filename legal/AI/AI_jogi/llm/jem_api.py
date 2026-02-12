@@ -71,11 +71,7 @@ class LegalAnalyzer:
         self.client = genai.Client(api_key=gemini_api_key)
         self.model_name = "gemini-2.5-flash"
         
-        # # 클래스 이름 로드
-        # with open(f"{model_path}/config.json", 'r') as f:
-        #     config = json.load(f)
-        #     self.class_names = config.get('class_names', ['민사/가사소송', '행정소송', '형사소송'])
-    
+       
     def predict_bert(self, text: str) -> Dict[str, Any]:
         """BERT로 기본 수치 예측"""
         inputs = self.tokenizer(
@@ -97,18 +93,68 @@ class LegalAnalyzer:
         # logits = outputs['logits']
         # case_type_idx = logits.argmax(-1).item()
         
+        # 원본값
+        raw_win_rate = outputs['win_rate'].item()
+        print(f"🔍 원본값: {raw_win_rate}")
+        print(f"🔍 10배값: {raw_win_rate * 10}")
+        
+        raw_sentence = outputs['sentence'].item()
+        raw_fine = outputs['fine'].item()
+        raw_risk = outputs['risk'].item()
+        
+          
+        
+        # 비정상 값을 현실적 범위로 변환
+        # 승소율: 10배 후 0~100 제한
+        win_rate = max(0, min(100, raw_win_rate * 10))
+        print(f"🔍 최종값: {win_rate}")
+        
+        # 위험도: 10배 후 0~100 제한
+        risk = max(0, min(100, raw_risk * 10))
+        
+        
+        # 형량
+        if raw_sentence < 0.5:  # 0.5년(6개월) 미만이면
+            sentence = 0
+        else:
+            # sentence = max(0, min(30, raw_sentence * 10))
+            sentence = max(0, min(30, raw_sentence))
+    
+    
+        # 벌금
+        if raw_fine < 10:  # 10 미만이면
+            fine = 0
+        else:
+            # fine = max(0, min(100000000, raw_fine * 1000000))
+            fine = max(0, min(100000000, raw_fine))
+            
         return {
-           'case_type': "법률 사건 분석", #self.class_names[case_type_idx],
-            'win_rate': max(0, min(100, outputs['win_rate'].item())),
-            'sentence': max(0, outputs['sentence'].item()),
-            'fine': max(0, outputs['fine'].item()),
-            'risk': max(0, min(100, outputs['risk'].item()))
+            'case_type': "법률 사건 분석",
+            'win_rate': round(win_rate, 2),
+            'sentence': round(sentence, 2),
+            'fine': round(fine, 0),
+            'risk': round(risk, 2)
+    
+        
+        # return {
+        #    'case_type': "법률 사건 분석", #self.class_names[case_type_idx],
+        #     'win_rate': round(max(0, min(100, outputs['win_rate'].item())), 2),
+        #     'sentence': round(max(0, outputs['sentence'].item()), 2),
+        #     'fine': max(0, outputs['fine'].item()),
+        #     'risk': max(0, min(100, outputs['risk'].item()))
         }
     
     def generate_feedback(self, story: str, bert_results: Dict) -> str:
         """Gemini로 상세 피드백 생성"""
         prompt = f"""
-당신은 법률 전문가이자 승소율 높은 최고의 변호사입니다. 다음 사연을 분석하고 조언해주세요.
+당신은 매우 유능한 법률전문가 입니다. 제공된 [AI 예측 수치]를 법률적 가이드라인으로 참고하여, 의뢰인의 [사연]에 대해 신뢰감 있고 객관적인 최종 분석을 제공하세요.
+
+**작성 가이드라인**:
+1. AI 수치는 참고용일 뿐입니다. 대한민국 형법과 실제 판례를 기준으로 현실적인 수치로 조정하세요.
+2. AI 모델에 대한 평가(예: "오판이다", "부적절하다")나 본인 자랑(예: "매우 유능한")은 절대 하지 마세요.
+3. AI 수치를 법률적 관점에서 재해석하여, 최종적으로 판단한 '승소 가능성'과 '대응 전략'만 정중하게 답변하세요.
+4. 예상 형량이 없다면 '0', 벌금이 없다면 '0'으로 기재하세요.
+5. 모든 답변은 완성된 문장으로 작성하세요.
 
 【사연】
 {story}
@@ -120,25 +166,21 @@ class LegalAnalyzer:
 - 예상 벌금: {bert_results['fine']:,.0f}원
 - 위험도: {bert_results['risk']:.1f}/100
 
+**중요**: 위 AI 예측값을 검토하여, 형량/벌금/위험도를 고려했을 때 승소율이 적절한지 판단하세요.
+- 사연을 작성한 사람은 당신의 의뢰인입니다. 사연을 분석한 후 AI예측값을 검토하여 형량과 벌금 그리고 승소율, 위험도가 적절하게 나왔는지 판단후, 적정치 않다면 당신의 의견을 기준으로 답변을 주세요.
+
 다음 형식으로 답변해주세요:
 
-1. 승소율 분석
-   - 예측 근거
-   - 유리한 점
-   - 불리한 점
+- 최종승소율: [0-100 사이 숫자만]
+- 최종형량: [숫자]
+- 최종벌금: [숫자, 단위 제외]
+- 최종위험도: [0-100 사이 숫자]
 
-2. 대응 전략
-   - 즉시 해야 할 조치
-   - 증거 확보 방안
-   - 법률 검토 포인트
+- 승소율 분석
+[이 사건의 상황을 고려할 때 왜 이 정도의 승소 가능성이 있는지 200자 이내로 설명]
 
-3. 주의사항
-   - 법적 위험 요소
-   - 피해야 할 행동
-
-4. 전문가 상담 추천
-   - 필요성 (상/중/하)
-   - 추천 전문 분야
+- 법률 검토 포인트
+[의뢰인이 지금 당장 준비해야 할 핵심 법률 쟁점과 대응책을 200자 이내로 설명]
 """
         
         # response = self.gemini_model.generate_content(prompt)
@@ -156,9 +198,67 @@ class LegalAnalyzer:
         print("💬 Gemini 피드백 생성 중...")
         feedback = self.generate_feedback(story, bert_results)
         
+        
+        # 추가 2/11
+        # Gemini 응답에서 최종 승소율 추출
+        import re
+        # match = re.search(r'최종승소율.*?(\d+(?:\.\d+)?)', feedback)
+        
+        # if match:
+        #     final_win_rate = float(match.group(1))
+        #     print(f"✅ Gemini가 승소율을 {bert_results['win_rate']}% → {final_win_rate}%로 조정")
+        # else:
+        #     final_win_rate = bert_results['win_rate']
+        #     print(f"⚠️ Gemini 응답에서 숫자를 찾지 못함. (응답 서두: {feedback[:50]}...)")
+        
+        # # "최종승소율: XX" 부분은 피드백에서 제거
+        # # feedback_cleaned = re.sub(r'최종승소율:\s*\d+(?:\.\d+)?\s*\n*', '', feedback).strip()
+        # feedback_cleaned = re.sub(r'(\d+\.\s*)?(\*\*|__)?최종승소율(\*\*|__)?.*?\n', '', feedback, flags=re.IGNORECASE).strip()
+        # 여기까지 추가했음.
+        
+        
+        # 1. 승소율 추출 및 로그
+        match_win = re.search(r'최종승소율.*?(\d+(?:\.\d+)?)', feedback)
+        if match_win:
+            final_win_rate = float(match_win.group(1))
+            print(f"✅ 승소율 조정: {bert_results['win_rate']}% -> {final_win_rate}%")
+        else:
+            final_win_rate = bert_results['win_rate']
+            print("⚠️ 승소율 추출 실패: BERT 기본값 유지")
+
+        # 2. 형량 추출 및 로그
+        match_sent = re.search(r'최종형량.*?(\d+(?:\.\d+)?)', feedback)
+        final_sentence = float(match_sent.group(1)) if match_sent else bert_results['sentence']
+        if match_sent: print(f"✅ 형량 조정: {bert_results['sentence']}년 -> {final_sentence}년")
+
+        # 3. 벌금 추출 및 로그
+        match_fine = re.search(r'최종벌금.*?(\d+(?:\.\d+)?)', feedback)
+        final_fine = float(match_fine.group(1)) if match_fine else bert_results['fine']
+        if match_fine: print(f"✅ 벌금 조정: {bert_results['fine']}원 -> {final_fine}원")
+
+        # 4. 위험도 추출 및 로그
+        match_risk = re.search(r'최종위험도.*?(\d+(?:\.\d+)?)', feedback)
+        final_risk = float(match_risk.group(1)) if match_risk else bert_results['risk']
+        if match_risk: print(f"✅ 위험도 조정: {bert_results['risk']} -> {final_risk}")
+        
+        
+        # feedback_cleaned = re.sub(r'(\d+\.\s*)?(\*\*|__)?최종승소율(\*\*|__)?.*?\n', '', feedback, flags=re.IGNORECASE).strip()
+        # 더 확실하게 지우는 버전
+        feedback_cleaned = re.sub(r'-?\s*최종(승소율|형량|벌금|위험도).*?(\n|$)', '', feedback, flags=re.IGNORECASE).strip()
+        
+        
+        
+        
+        
+        
         return {
             **bert_results,
-            'feedback': feedback,
+            'win_rate': round(final_win_rate, 2),  # Gemini가 결정한 최종 승소율
+            # 'feedback': feedback,
+            'sentence': round(final_sentence, 2),
+            'fine': round(final_fine, 0),
+            'risk': round(final_risk, 2),
+            'feedback': feedback_cleaned,
             'original_story': story
         }
     

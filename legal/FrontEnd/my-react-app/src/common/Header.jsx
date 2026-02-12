@@ -81,7 +81,7 @@ export default function Header() {
               }`}
           >
             <span className="text-base">📋</span>
-            <span>법률 종합 검과</span>
+            <span>법률 분석 서비스</span>
           </NavLink>
 
           <a
@@ -179,7 +179,7 @@ export default function Header() {
               onClick={() => setShowMobileMenu(false)}
             >
               <span>📋</span>
-              <span>법률 종합 검과</span>
+              <span>법률 분석 서비스</span>
             </NavLink>
 
             <a

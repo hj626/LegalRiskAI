@@ -253,7 +253,7 @@ ${result.legal_list && result.legal_list.length > 0 ? `관련 법률: ${result.l
 
              {/* AI 피드백 */}
             <div className="bg-gradient-to-br from-indigo-50 to-violet-50 rounded-xl p-6 border border-indigo-100">
-                <h4 className="text-base font-semibold text-slate-800 mb-4">🤖 AI 승소율 분석 피드백 (Gemini)</h4>
+                <h4 className="text-base font-semibold text-slate-800 mb-4">AI 승소율 분석 피드백</h4>
                 <div className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">
                     {result.feedback}
                 </div>

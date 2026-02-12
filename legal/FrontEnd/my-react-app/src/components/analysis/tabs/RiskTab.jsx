@@ -40,8 +40,8 @@ export default function SolutionTab({ inputText }) {
 
 [위험도] ${result.risk}%
 [사건 유형] ${result.case_type}
-[예상 형량] ${result.sentence}
-[예상 벌금] ${result.fine.toLocaleString()}원`;
+[예상 형량] ${result.sentence === "0.0년" ? "없음" : result.sentence}
+[예상 벌금] ${result.fine === 0 ? "없음" : `${result.fine.toLocaleString()}원`}`;
 
             await axios.post(`${BACKEND_API}/api/law/save`, {
                 law_input: inputText,
@@ -114,8 +114,8 @@ export default function SolutionTab({ inputText }) {
 
 위험도: ${result.risk}%
 사건 유형: ${result.case_type}
-예상 형량: ${result.sentence}
-예상 벌금: ${result.fine.toLocaleString()}원`;
+예상 형량: ${result.sentence === "0.0년" ? "없음" : result.sentence}
+예상 벌금: ${result.fine === 0 ? "없음" : `${result.fine.toLocaleString()}원`}`;
 
         try {
             await navigator.clipboard.writeText(textToCopy);
@@ -252,7 +252,7 @@ export default function SolutionTab({ inputText }) {
             <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-100">
                 <h4 className="text-base font-semibold text-slate-800 mb-3">⏱️ 예상 형량</h4>
                 <div className="text-2xl font-bold text-purple-700">
-                    {result.sentence}
+                    {result.sentence === "0.0년" ? "없음" : result.sentence}
                 </div>
             </div>
 
@@ -260,7 +260,7 @@ export default function SolutionTab({ inputText }) {
             <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-6 border border-orange-100">
                 <h4 className="text-base font-semibold text-slate-800 mb-3">💰 예상 벌금</h4>
                 <div className="text-2xl font-bold text-orange-700">
-                    {result.fine.toLocaleString()}원
+                    {result.fine === 0 ? "없음" : `${result.fine.toLocaleString()}원`}
                 </div>
             </div>
 

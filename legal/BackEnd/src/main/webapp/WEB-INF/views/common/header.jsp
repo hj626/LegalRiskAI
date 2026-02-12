@@ -283,7 +283,7 @@
     <nav class="nav">
       <a href="<%= ctx %>/ai-analysis" class="<%= activeBoonjang %>">
         <span style="font-size:16px;">📋</span>
-        <span>법률 종합 검과</span>
+        <span>법률 분석 서비스</span>
       </a>
       <a href="<%= ctx %>/mypage/main">
         <span style="font-size:16px;">👤</span>

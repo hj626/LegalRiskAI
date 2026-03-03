@@ -81,17 +81,19 @@ LegalRiskAI/
 
 ## 🖥 실행 화면
 
-### 👤 회원 로그인 / 회원가입
-(링크)
+### 👤 회원가입/로그인/기능 사용
 
-### ✍ 사건 입력 및 분석요청 화면
-(링크)
+https://github.com/user-attachments/assets/b41ed732-8d1c-41b2-9ce5-ac34999fcef1
 
-### 🤖 사건분석 결과 화면(기능별)
-(gif/결과%20페이지.gif)
 
-## 🎥 전체 시연 영상
-[▶️ Legal AI 전체 시연 영상 보기](링크)
+
+<br>
+
+### ✍ 어드민 사용
+
+https://github.com/user-attachments/assets/3b009652-51b0-4bdd-9df7-f89c20bfbd18
+
+
 ---
 
 

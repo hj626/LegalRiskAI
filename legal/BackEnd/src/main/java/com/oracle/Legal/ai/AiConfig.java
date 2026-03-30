@@ -1,3 +1,4 @@
+//디버깅 수정완료
 package com.oracle.Legal.ai;
 
 import org.springframework.context.annotation.Bean;

@@ -1,0 +1,23 @@
+# .gitignore (Spring Boot)
+
+# Compiled class files
+*.class
+target/
+build/
+
+# IDE files
+.settings/
+.classpath
+.project
+.idea/
+*.iml
+*.iws
+
+# Sensitive configuration - MODIFIED TO INCLUDE application.yml
+src/main/resources/application.yml
+
+# Log files
+*.log
+
+# Gradle
+.gradle/

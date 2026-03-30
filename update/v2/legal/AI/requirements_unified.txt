@@ -1,0 +1,26 @@
+# Unified AI dependencies (v2)
+
+# FastAPI
+fastapi==0.128.5
+uvicorn==0.40.0
+pydantic==2.12.5
+python-multipart==0.0.9
+
+# AI / ML / LLM
+google-generativeai==0.8.6
+google-genai==0.6.0
+python-dotenv==1.2.1
+torch==2.2.1
+transformers==5.1.0
+accelerate==0.27.2
+sentencepiece==0.2.0
+sentence-transformers==5.2.2
+faiss-cpu==1.13.2
+huggingface_hub==1.4.1
+
+# Data
+numpy==1.26.3
+pandas==3.0.0
+pyarrow==23.0.0
+requests==2.31.0
+tqdm==4.66.1

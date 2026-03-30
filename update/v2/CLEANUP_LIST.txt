@@ -1,0 +1,23 @@
+# Cleanup List (Files to Delete)
+
+The following files are redundant and should be removed from the repository to reduce clutter and confusion.
+
+## 1. Redundant React Build Assets
+Location: `legal/BackEnd/src/main/resources/static/assets/`
+The following old build versions should be deleted:
+- `index-BRaV48VK.js`
+- `index-BpH59cLR.js`
+- `index-DNzZ4Dku.js`
+- `index-BcjAzlsz.css`
+- `index-CU5afY_E.css`
+(Only keep the most recent version, usually the one currently referenced in your index.html/JSP)
+
+## 2. Backup Source Files
+The following backup files should be deleted:
+- `legal/FrontEnd/my-react-app/src/pages/AIAnalysis_backup.jsx`
+- `legal/AI/AI_jogi/app/main copy.py`
+- `legal/AI/AI_jogi/llm/main_copy.py`
+
+## 3. Misplaced Files
+- `legal/BackEnd/component/footer.jsx` (Should move to FrontEnd if needed, or delete if redundant)
+- `legal/BackEnd/component/header.jsx` (Should move to FrontEnd if needed, or delete if redundant)
